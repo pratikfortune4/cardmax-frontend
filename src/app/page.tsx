@@ -1,6 +1,6 @@
 import React from 'react'
 import { cookies } from 'next/headers'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import {
   DashboardView,
   LandingView,
@@ -14,17 +14,15 @@ export const metadata = {
 
 export default async function HomePage() {
   const cookieStore = await cookies()
-  const cookieHeader = cookieStore.toString()
+  const token = cookieStore.get('payload-token')?.value
 
-  if (!cookieStore.has('payload-token')) {
+  if (!token) {
     return <LandingView />
   }
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/users/dashboard`, {
-      headers: {
-        Cookie: cookieHeader,
-      },
+      headers: getAuthHeaders(token),
       cache: 'no-store',
     })
 

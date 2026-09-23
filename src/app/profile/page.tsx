@@ -1,7 +1,7 @@
 import React from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { ProfileView, UserProfileData } from './profile-view'
 
 export const metadata = {
@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   let profileData: UserProfileData | null = null
   try {
     const res = await fetch(`${API_BASE_URL}/api/users/profile`, {
-      headers: { cookie: `payload-token=${token}` },
+      headers: getAuthHeaders(token),
       cache: 'no-store',
     })
 
@@ -29,7 +29,8 @@ export default async function ProfilePage() {
     }
 
     profileData = await res.json()
-  } catch {
+  } catch (err: any) {
+    if (err?.digest?.startsWith('NEXT_REDIRECT')) throw err
     redirect('/login')
   }
 

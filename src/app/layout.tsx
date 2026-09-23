@@ -2,7 +2,7 @@ import React from 'react'
 import { headers as getHeaders, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { hasRequiredConsent } from '@/lib/guard'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { PolicyBanner } from '@/components/PolicyBanner'
 import { Navbar, type NavbarUser } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
@@ -27,16 +27,14 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const headers = await getHeaders()
   const pathname = headers.get('x-pathname') || ''
   const cookieStore = await cookies()
-  const cookieHeader = cookieStore.toString()
+  const token = cookieStore.get('payload-token')?.value
 
   let currentUser: NavbarUser | null = null
 
-  if (cookieStore.has('payload-token')) {
+  if (token) {
     try {
       const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-        headers: {
-          Cookie: cookieHeader,
-        },
+        headers: getAuthHeaders(token),
         cache: 'no-store',
       })
 

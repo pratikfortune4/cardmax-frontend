@@ -6,6 +6,36 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
+/**
+ * Generates headers for SSR / Server Component fetch requests to the Payload CMS backend.
+ * Provides both Bearer authorization (RFC6750) and Cookie headers to pass Payload's
+ * authentication and CSRF filters seamlessly in server-side Next.js execution.
+ */
+export function getAuthHeaders(
+  tokenOrCookies?: string | { get: (name: string) => { value: string } | undefined } | null,
+  additionalHeaders: Record<string, string> = {},
+): Record<string, string> {
+  let token: string | undefined
+
+  if (typeof tokenOrCookies === 'string') {
+    token = tokenOrCookies
+  } else if (tokenOrCookies && typeof (tokenOrCookies as any).get === 'function') {
+    token = (tokenOrCookies as any).get('payload-token')?.value
+  }
+
+  const headers: Record<string, string> = {
+    'Sec-Fetch-Site': 'same-origin',
+    ...additionalHeaders,
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+    headers['Cookie'] = `payload-token=${token}`
+  }
+
+  return headers
+}
+
 export interface ApiRequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined | null>
 }

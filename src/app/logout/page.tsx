@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { LogoutButton } from './logout-button'
 
 export default async function LogoutPage() {
@@ -14,9 +14,7 @@ export default async function LogoutPage() {
   let userEmail = 'User'
   try {
     const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      headers: {
-        cookie: `payload-token=${token}`,
-      },
+      headers: getAuthHeaders(token),
       cache: 'no-store',
     })
     if (!res.ok) {

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { hasRequiredConsent } from '@/lib/guard'
 import { ConsentOnboardingForm } from './consent-onboarding-form'
 import './styles.scss'
@@ -22,7 +22,7 @@ export default async function ConsentOnboardingPage() {
   let user = null
   try {
     const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      headers: { cookie: `payload-token=${token}` },
+      headers: getAuthHeaders(token),
       cache: 'no-store',
     })
     if (res.ok) {

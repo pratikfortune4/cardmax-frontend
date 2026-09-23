@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { API_BASE_URL } from '@/lib/api'
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { isProfileComplete } from '@/lib/guard'
 import { CompleteProfileForm } from './complete-profile-form'
 
@@ -15,7 +15,7 @@ export default async function CompleteProfilePage() {
   let user = null
   try {
     const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      headers: { cookie: `payload-token=${token}` },
+      headers: getAuthHeaders(token),
       cache: 'no-store',
     })
     if (res.ok) {
