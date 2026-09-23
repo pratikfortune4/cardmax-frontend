@@ -1,0 +1,465 @@
+// ==========================================================================
+// CardMax SaaS Consent Settings Stylesheet
+// PointsFly-inspired premium fintech aesthetic & unified color system
+// ==========================================================================
+
+$color-bg: #F7F7FC;
+$color-surface: #FFFFFF;
+$color-surface-hover: #F1F0FA;
+$color-surface-subtle: #F7F7FC;
+
+$color-text-primary: #111827;
+$color-text-secondary: #6B7280;
+$color-text-muted: #9CA3AF;
+
+$color-border: rgba(84, 120, 240, 0.12);
+$color-border-subtle: #F1F4FA;
+
+$color-accent: #5478F0;
+$color-accent-hover: #4064E0;
+$color-accent-subtle: #EEF2FE;
+$color-accent-border: rgba(84, 120, 240, 0.25);
+
+$color-success-text: #15803D;
+$color-success-bg: #DCFCE7;
+$color-success-border: #86EFAC;
+
+$color-danger-text: #B91C1C;
+$color-danger-hover: #991B1B;
+$color-danger-bg: #FEE2E2;
+$color-danger-border: #FECACA;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-full: 9999px;
+
+$shadow-sm: 0 4px 20px rgba(17, 24, 39, 0.04);
+$shadow-card: 0 8px 30px rgba(17, 24, 39, 0.06);
+
+$gradient-primary: linear-gradient(135deg, #5478F0 0%, #6E8EF5 50%, #4064E0 100%);
+$gradient-primary-hover: linear-gradient(135deg, #6E8EF5 0%, #829EF7 50%, #5478F0 100%);
+
+$font-sans: var(--font-inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+
+.consent-page-wrapper {
+  min-height: calc(100vh - 60px);
+  background-color: $color-bg;
+  color: $color-text-primary;
+  font-family: $font-sans;
+  padding: 1.25rem 1rem 2.5rem;
+  -webkit-font-smoothing: antialiased;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a,
+  button,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: none;
+    border-color: $color-accent;
+    box-shadow: 0 0 0 3px rgba(84, 120, 240, 0.15);
+  }
+
+  .consent-container {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .consent-breadcrumb {
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: $color-text-secondary;
+      text-decoration: none;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: $color-accent;
+      }
+    }
+  }
+
+  .consent-header {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 1rem 1.25rem;
+    box-shadow: $shadow-sm;
+
+    .header-text {
+      h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $color-text-primary;
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        margin: 0.2rem 0 0;
+        font-size: 0.825rem;
+        color: $color-text-secondary;
+      }
+    }
+  }
+
+  .consent-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.85rem;
+    border-radius: $radius-md;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: $shadow-sm;
+
+    &.success {
+      background-color: $color-success-bg;
+      color: $color-success-text;
+      border: 1px solid $color-success-border;
+    }
+
+    &.error {
+      background-color: $color-danger-bg;
+      color: $color-danger-text;
+      border: 1px solid $color-danger-border;
+    }
+
+    .alert-content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alert-icon {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .alert-close {
+      background: transparent;
+      border: none;
+      padding: 0.2rem;
+      cursor: pointer;
+      color: currentColor;
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .consent-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: $color-text-secondary;
+    gap: 0.75rem;
+
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid $color-border;
+      border-top-color: $color-accent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+
+  .consent-sections-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .consent-card {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 1.15rem 1.35rem;
+    box-shadow: $shadow-sm;
+    display: flex;
+    flex-direction: column;
+
+    .card-header {
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid $color-border-subtle;
+
+      h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: $color-text-primary;
+      }
+
+      p {
+        margin: 0.15rem 0 0;
+        font-size: 0.8rem;
+        color: $color-text-secondary;
+      }
+    }
+  }
+
+  .consent-items-list {
+    display: flex;
+    flex-direction: column;
+
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid $color-border-subtle;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      &:first-child {
+        padding-top: 0.85rem;
+      }
+
+      .row-info {
+        flex: 1;
+        min-width: 0;
+
+        .row-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+
+          h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $color-text-primary;
+          }
+        }
+
+        p {
+          margin: 0.25rem 0 0;
+          font-size: 0.8rem;
+          color: $color-text-secondary;
+          line-height: 1.4;
+        }
+
+        .meta-text {
+          display: block;
+          font-size: 0.725rem;
+          color: $color-text-muted;
+          margin-top: 0.25rem;
+        }
+      }
+
+      .row-action {
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
+    }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.45rem;
+    border-radius: $radius-full;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    &.badge-required {
+      background-color: $color-surface-subtle;
+      color: $color-text-secondary;
+      border: 1px solid $color-border;
+    }
+
+    &.badge-active {
+      background-color: $color-success-bg;
+      color: $color-success-text;
+      border: 1px solid $color-success-border;
+    }
+
+    &.badge-inactive {
+      background-color: $color-surface-subtle;
+      color: $color-text-muted;
+      border: 1px solid $color-border;
+    }
+  }
+
+  .btn-disconnect {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 0.65rem;
+    border-radius: $radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: transparent;
+    color: $color-danger-text;
+    border: 1px solid $color-danger-border;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background-color: $color-danger-bg;
+      color: $color-danger-hover;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-connect {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 0.95rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: $gradient-primary;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(84, 120, 240, 0.3);
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $gradient-primary-hover;
+      box-shadow: 0 4px 12px rgba(84, 120, 240, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+
+  // Toggle Switch
+  .switch-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+
+      &:checked + .switch-slider {
+        background-color: $color-accent;
+
+        &:before {
+          transform: translateX(16px);
+        }
+      }
+
+      &:disabled + .switch-slider {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #cbd5e1;
+      border-radius: $radius-full;
+      transition: background-color 0.2s ease;
+
+      &:before {
+        position: absolute;
+        content: '';
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+
+  // Legal Rows
+  .legal-links-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+
+    .legal-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid $color-border-subtle;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .legal-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $color-text-primary;
+      }
+
+      .legal-action-group {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+
+        .version-pill {
+          font-size: 0.7rem;
+          color: $color-text-secondary;
+          background-color: $color-surface-subtle;
+          border: 1px solid $color-border;
+          padding: 0.05rem 0.4rem;
+          border-radius: $radius-sm;
+        }
+
+        .legal-link {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: $color-accent;
+          text-decoration: none;
+          transition: color 0.15s ease;
+
+          &:hover {
+            color: $color-accent-hover;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

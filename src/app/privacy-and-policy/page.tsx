@@ -1,0 +1,43 @@
+export default function PrivacyPolicy() {
+  return (
+    <div
+      style={{
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '40px 20px',
+        fontFamily: 'sans-serif',
+      }}
+    >
+      <h1 style={{ marginBottom: '20px' }}>Privacy Policy</h1>
+      <p style={{ lineHeight: '1.6', marginBottom: '20px' }}>
+        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+        been the industry's standard dummy text ever since 1966, when designers at Letraset and
+        James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero
+        translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has
+        survived not only many decades, but also the leap into electronic typesetting, remaining
+        essentially unchanged. It was popularised thanks to these sheets and more recently with
+        desktop publishing software like Aldus PageMaker and Microsoft Word including versions of
+        Lorem Ipsum.
+      </p>
+      <h2 style={{ marginTop: '30px', marginBottom: '15px' }}>Data Collection</h2>
+      <p style={{ lineHeight: '1.6', marginBottom: '20px' }}>
+        It is a long established fact that a reader will be distracted by the readable content of a
+        page when looking at its layout. The point of using Lorem Ipsum is that it has a
+        more-or-less normal distribution of letters, as opposed to using 'Content here, content
+        here', making it look like readable English. Many desktop publishing packages and web page
+        editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will
+        uncover many web sites still in their infancy.
+      </p>
+      <h2 style={{ marginTop: '30px', marginBottom: '15px' }}>Data Usage</h2>
+      <p style={{ lineHeight: '1.6', marginBottom: '20px' }}>
+        Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece
+        of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock,
+        a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure
+        Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the
+        word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from
+        sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and
+        Evil) by Cicero, written in 45 BC.
+      </p>
+    </div>
+  )
+}

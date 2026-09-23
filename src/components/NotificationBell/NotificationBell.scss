@@ -1,0 +1,482 @@
+// NotificationBell.scss
+// CardMax Notification Bell — Clean Light Fintech Theme matching CardMax Design System
+
+// ─── Variables ────────────────────────────────────────────────────────────────
+$bell-size: 38px;
+$badge-color: #ef4444;
+$accent: #4f46e5;
+$accent-hover: #4338ca;
+$accent-light: #eef2ff;
+$surface: #ffffff;
+$surface-border: #e2e8f0;
+$surface-hover: #f8fafc;
+$text-primary: #0f172a;
+$text-secondary: #475569;
+$text-muted: #64748b;
+$unread-bg: #eef2ff;
+$unread-hover: #e0e7ff;
+$unread-dot: #4f46e5;
+$radius: 16px;
+$shadow:
+  0 18px 40px -6px rgba(15, 23, 42, 0.1),
+  0 4px 16px -2px rgba(79, 70, 229, 0.06);
+
+// ─── Bell Shake animation ─────────────────────────────────────────────────────
+@keyframes bellShake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: rotate(-12deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: rotate(12deg);
+  }
+}
+
+// ─── Badge pulse animation ────────────────────────────────────────────────────
+@keyframes badgePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($badge-color, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba($badge-color, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($badge-color, 0);
+  }
+}
+
+// ─── Dropdown slide-in ────────────────────────────────────────────────────────
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── Root container ───────────────────────────────────────────────────────────
+.cm-notif-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+// ─── Trigger button (Navbar) ──────────────────────────────────────────────────
+.cm-notif-bell__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $bell-size;
+  height: $bell-size;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+  outline: none;
+
+  &:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+  }
+
+  &.is-open {
+    background: #ffffff;
+    border-color: #4f46e5;
+    color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  }
+
+  &.is-new .cm-notif-bell__icon {
+    animation: bellShake 0.8s ease-in-out;
+  }
+}
+
+.cm-notif-bell__icon {
+  flex-shrink: 0;
+}
+
+// ─── Unread badge ─────────────────────────────────────────────────────────────
+.cm-notif-bell__badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: $badge-color;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  animation: badgePulse 2s ease-out 1;
+  pointer-events: none;
+  border: 2px solid #f4f6fc; // Blends cleanly with navbar background
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+// ─── Mobile Backdrop ──────────────────────────────────────────────────────────
+.cm-notif-backdrop {
+  display: none;
+
+  @media (max-width: 640px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1040;
+    animation: cmNotifFadeIn 0.18s ease;
+  }
+}
+
+@keyframes cmNotifFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ─── Dropdown panel ───────────────────────────────────────────────────────────
+.cm-notif-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 370px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  background: $surface;
+  border: 1px solid $surface-border;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  z-index: 1050;
+  animation: dropdownIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  overflow: hidden;
+
+  @media (max-width: 640px) {
+    position: fixed;
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: 440px;
+    margin: 0 auto;
+    max-height: calc(100dvh - 84px);
+    border-radius: 14px;
+    box-shadow:
+      0 20px 45px -10px rgba(15, 23, 42, 0.25),
+      0 4px 16px -2px rgba(79, 70, 229, 0.08);
+  }
+}
+
+// ─── Dropdown header ──────────────────────────────────────────────────────────
+.cm-notif-dropdown__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f3f7;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    padding: 12px 14px 10px;
+  }
+}
+
+.cm-notif-dropdown__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: -0.01em;
+}
+
+.cm-notif-dropdown__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cm-notif-dropdown__mark-all {
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  background: $accent-light;
+  border: none;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #dbe4fe;
+    color: $accent-hover;
+  }
+}
+
+.cm-notif-dropdown__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #e2e8f0;
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+// ─── Notification list ────────────────────────────────────────────────────────
+.cm-notif-dropdown__list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4f46e573 #f4f6fc;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #5478f073;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: $accent;
+    }
+  }
+}
+
+// ─── Empty / loading state ────────────────────────────────────────────────────
+.cm-notif-dropdown__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 20px;
+  gap: 12px;
+  color: $text-secondary;
+  font-size: 13px;
+  text-align: center;
+
+  .cm-notif-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: $accent-light;
+    color: $accent;
+    margin-bottom: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #64748b;
+  }
+}
+
+.cm-notif-spinner {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid rgba($accent, 0.18);
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+// ─── Individual notification item ─────────────────────────────────────────────
+.cm-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 18px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  position: relative;
+
+  @media (max-width: 640px) {
+    padding: 11px 14px;
+    gap: 10px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #f1f3f7;
+  }
+
+  &:hover {
+    background: $surface-hover;
+  }
+
+  &.is-unread {
+    background: $unread-bg;
+
+    &:hover {
+      background: $unread-hover;
+    }
+
+    .cm-notif-item__title {
+      font-weight: 700;
+      color: $text-primary;
+    }
+  }
+}
+
+.cm-notif-item__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: $accent-light;
+  border: 1px solid #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.cm-notif-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cm-notif-item__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cm-notif-item__message {
+  font-size: 12px;
+  color: $text-secondary;
+  margin: 0 0 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.cm-notif-item__time {
+  font-size: 11px;
+  font-weight: 500;
+  color: $text-muted;
+}
+
+.cm-notif-item__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $unread-dot;
+  margin-top: 5px;
+  box-shadow: 0 0 6px rgba($unread-dot, 0.4);
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+.cm-notif-dropdown__footer {
+  padding: 11px 18px;
+  border-top: 1px solid #f1f3f7;
+  background: #fafbfe;
+  flex-shrink: 0;
+  text-align: center;
+
+  @media (max-width: 640px) {
+    padding: 10px 14px;
+  }
+}
+
+.cm-notif-dropdown__view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: $accent;
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $accent-hover;
+    background: $accent-light;
+    text-decoration: none;
+  }
+}
