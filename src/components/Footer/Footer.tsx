@@ -14,8 +14,8 @@ const HIDDEN_ROUTES = [
 
 export const Footer: React.FC = () => {
   const pathname = usePathname()
-  const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || '/api/swagger'
-  const docsUrl = process.env.NEXT_PUBLIC_API_DOCS_URL || '/api/docs'
+  const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || ''
+  const docsUrl = process.env.NEXT_PUBLIC_API_DOCS_URL || ''
 
   const shouldHide = HIDDEN_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + '/')
