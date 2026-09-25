@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { EMPLOYMENT_TYPES } from '@/lib/profileOptions'
 import { API_BASE_URL } from '@/lib/api'
+import { ConfirmationModal } from '@/components/Confirmation/ConfirmationModal'
 import './styles.scss'
 
 export interface UserProfileData {
@@ -36,6 +37,7 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [updatingMarketing, setUpdatingMarketing] = useState(false)
   const [alert, setAlert] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
@@ -202,8 +204,7 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
     }
   }
 
-  const handleLogout = async () => {
-    if (!window.confirm('Are you sure you want to sign out of CardMax?')) return
+  const handleConfirmLogout = async () => {
     setLoggingOut(true)
     try {
       await fetch(`${API_BASE_URL}/api/users/logout`, { method: 'POST', credentials: 'include' })
@@ -747,7 +748,7 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
                   type="button"
                   id="btn-logout"
                   className="btn-signout"
-                  onClick={handleLogout}
+                  onClick={() => setIsLogoutModalOpen(true)}
                   disabled={loggingOut}
                 >
                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -764,6 +765,20 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
           </aside>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => {
+          if (!loggingOut) setIsLogoutModalOpen(false)
+        }}
+        onConfirm={handleConfirmLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out of CardMax?"
+        confirmText="Sign Out"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={loggingOut}
+      />
     </div>
   )
 }

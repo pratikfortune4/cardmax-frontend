@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { API_BASE_URL } from '@/lib/api'
+import { ConfirmationModal } from '@/components/Confirmation/ConfirmationModal'
 import './gmail-consent.scss'
 
 interface GmailStatus {
@@ -33,6 +34,7 @@ export const GmailForm = () => {
   const [loading, setLoading] = useState(true)
   const [ingesting, setIngesting] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
+  const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false)
   const [error, setError] = useState(() => {
     if (typeof window === 'undefined') return ''
     const queryError = new URLSearchParams(window.location.search).get('error')
@@ -75,12 +77,7 @@ export const GmailForm = () => {
     }
   }, [])
 
-  const handleDisconnect = async () => {
-    if (
-      !window.confirm('Disconnect Gmail? CardMax will no longer be able to read your statements.')
-    ) {
-      return
-    }
+  const handleConfirmDisconnect = async () => {
     setDisconnecting(true)
     setError('')
     setIngestResult(null)
@@ -99,6 +96,7 @@ export const GmailForm = () => {
       setError('Network error. Please try again.')
     } finally {
       setDisconnecting(false)
+      setIsDisconnectModalOpen(false)
     }
   }
 
@@ -312,7 +310,7 @@ export const GmailForm = () => {
               <button
                 type="button"
                 className="btn-disconnect"
-                onClick={handleDisconnect}
+                onClick={() => setIsDisconnectModalOpen(true)}
                 disabled={disconnecting}
               >
                 {disconnecting ? 'Disconnecting…' : 'Disconnect Gmail Account'}
@@ -395,6 +393,20 @@ export const GmailForm = () => {
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={isDisconnectModalOpen}
+        onClose={() => {
+          if (!disconnecting) setIsDisconnectModalOpen(false)
+        }}
+        onConfirm={handleConfirmDisconnect}
+        title="Disconnect Gmail"
+        message="Are you sure you want to disconnect Gmail? CardMax will no longer be able to read your statements."
+        confirmText="Disconnect Gmail"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={disconnecting}
+      />
     </div>
   )
 }

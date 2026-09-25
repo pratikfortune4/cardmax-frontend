@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { API_BASE_URL } from '@/lib/api'
+import { ConfirmationModal } from '@/components/Confirmation/ConfirmationModal'
 import './styles.scss'
 
 interface ConsentSummary {
@@ -26,6 +27,7 @@ export default function ConsentPage() {
   const [summary, setSummary] = useState<ConsentSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
+  const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
   const loadSummary = useCallback(async () => {
@@ -129,14 +131,6 @@ export default function ConsentPage() {
   }
 
   const handleDisconnectGmail = async () => {
-    if (
-      !window.confirm(
-        'Disconnect Gmail? CardMax will stop searching your inbox and remove active statement permissions.',
-      )
-    ) {
-      return
-    }
-
     setUpdating('disconnect_gmail')
     setMessage(null)
 
@@ -167,6 +161,7 @@ export default function ConsentPage() {
       setMessage({ text: err.message || 'Failed to disconnect Gmail.', type: 'error' })
     } finally {
       setUpdating(null)
+      setIsDisconnectModalOpen(false)
     }
   }
 
@@ -327,7 +322,7 @@ export default function ConsentPage() {
                         <button
                           type="button"
                           className="btn-disconnect"
-                          onClick={handleDisconnectGmail}
+                          onClick={() => setIsDisconnectModalOpen(true)}
                           disabled={updating === 'disconnect_gmail'}
                         >
                           {updating === 'disconnect_gmail' ? 'Disconnecting…' : 'Disconnect Gmail'}
@@ -484,6 +479,20 @@ export default function ConsentPage() {
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={isDisconnectModalOpen}
+        onClose={() => {
+          if (updating !== 'disconnect_gmail') setIsDisconnectModalOpen(false)
+        }}
+        onConfirm={handleDisconnectGmail}
+        title="Disconnect Gmail"
+        message="Are you sure you want to disconnect Gmail? CardMax will stop searching your inbox and remove active statement permissions."
+        confirmText="Disconnect Gmail"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={updating === 'disconnect_gmail'}
+      />
     </div>
   )
 }

@@ -1,139 +1,238 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import Link from 'next/link'
-import AddCardModal from './components/AddCardModal'
-import EditCardModal from './components/EditCardModal'
-import ShowMeTheMathsModal, { type RecommendationMathData } from '@/components/Dashboard/ShowMeTheMathsModal'
-import type { BestCardByCategoryItem } from '@/types'
-import { API_BASE_URL } from '@/lib/api'
-import './styles.scss'
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
+import AddCardModal from "./components/AddCardModal";
+import EditCardModal from "./components/EditCardModal";
+import ShowMeTheMathsModal, {
+  type RecommendationMathData,
+} from "@/components/Dashboard/ShowMeTheMathsModal";
+import type { BestCardByCategoryItem } from "@/types";
+import { API_BASE_URL } from "@/lib/api";
+import "./styles.scss";
+import { ConfirmationModal } from "@/components/Confirmation/ConfirmationModal";
 
 // Category icon + display name mapping
-const CATEGORY_META: Record<string, { icon: string; label: string; multiplierFallback: string }> = {
-  'dining-and-delivery': { icon: '🍽️', label: 'Dining & Delivery', multiplierFallback: 'Dining Rewards' },
-  'dining':              { icon: '🍽️', label: 'Dining & Delivery', multiplierFallback: 'Dining Rewards' },
-  'dinning':             { icon: '🍽️', label: 'Dining & Delivery', multiplierFallback: 'Dining Rewards' },
-  'travel':              { icon: '✈️', label: 'Travel & Flights',  multiplierFallback: 'Travel Miles' },
-  'travel-and-flights':  { icon: '✈️', label: 'Travel & Flights',  multiplierFallback: 'Travel Miles' },
-  'fuel':                { icon: '⛽', label: 'Fuel Surcharge',    multiplierFallback: 'Fuel Waiver' },
-  'fuel-surcharge':      { icon: '⛽', label: 'Fuel Surcharge',    multiplierFallback: 'Fuel Waiver' },
-  'shopping':            { icon: '🛍️', label: 'Online Shopping',   multiplierFallback: 'Cashback' },
-  'online-shopping':     { icon: '🛍️', label: 'Online Shopping',   multiplierFallback: 'Cashback' },
-  'grocery':             { icon: '🥦', label: 'Grocery & Spends',   multiplierFallback: 'Cashback' },
-  'groceries':           { icon: '🥦', label: 'Grocery & Spends',   multiplierFallback: 'Cashback' },
-  'utilities':           { icon: '⚡', label: 'Utilities & Bills', multiplierFallback: 'Cashback' },
-  'utility-bills':       { icon: '⚡', label: 'Utilities & Bills', multiplierFallback: 'Cashback' },
-  'entertainment':       { icon: '🍿', label: 'Movies & Events',   multiplierFallback: 'BOGO Offer' },
-}
+const CATEGORY_META: Record<
+  string,
+  { icon: string; label: string; multiplierFallback: string }
+> = {
+  "dining-and-delivery": {
+    icon: "🍽️",
+    label: "Dining & Delivery",
+    multiplierFallback: "Dining Rewards",
+  },
+  dining: {
+    icon: "🍽️",
+    label: "Dining & Delivery",
+    multiplierFallback: "Dining Rewards",
+  },
+  dinning: {
+    icon: "🍽️",
+    label: "Dining & Delivery",
+    multiplierFallback: "Dining Rewards",
+  },
+  travel: {
+    icon: "✈️",
+    label: "Travel & Flights",
+    multiplierFallback: "Travel Miles",
+  },
+  "travel-and-flights": {
+    icon: "✈️",
+    label: "Travel & Flights",
+    multiplierFallback: "Travel Miles",
+  },
+  fuel: {
+    icon: "⛽",
+    label: "Fuel Surcharge",
+    multiplierFallback: "Fuel Waiver",
+  },
+  "fuel-surcharge": {
+    icon: "⛽",
+    label: "Fuel Surcharge",
+    multiplierFallback: "Fuel Waiver",
+  },
+  shopping: {
+    icon: "🛍️",
+    label: "Online Shopping",
+    multiplierFallback: "Cashback",
+  },
+  "online-shopping": {
+    icon: "🛍️",
+    label: "Online Shopping",
+    multiplierFallback: "Cashback",
+  },
+  grocery: {
+    icon: "🥦",
+    label: "Grocery & Spends",
+    multiplierFallback: "Cashback",
+  },
+  groceries: {
+    icon: "🥦",
+    label: "Grocery & Spends",
+    multiplierFallback: "Cashback",
+  },
+  utilities: {
+    icon: "⚡",
+    label: "Utilities & Bills",
+    multiplierFallback: "Cashback",
+  },
+  "utility-bills": {
+    icon: "⚡",
+    label: "Utilities & Bills",
+    multiplierFallback: "Cashback",
+  },
+  entertainment: {
+    icon: "🍿",
+    label: "Movies & Events",
+    multiplierFallback: "BOGO Offer",
+  },
+};
 
 function getMultiplierLabel(item: BestCardByCategoryItem): string {
-  if (item.isCashback && item.cashbackPercent > 0) return `${item.cashbackPercent}% Cashback`
-  if (!item.isCashback && item.rewardPointsPer100 > 0) return `${item.rewardPointsPer100}X Points`
-  return CATEGORY_META[item.categorySlug]?.multiplierFallback ?? 'Rewards'
+  if (item.isCashback && item.cashbackPercent > 0)
+    return `${item.cashbackPercent}% Cashback`;
+  if (!item.isCashback && item.rewardPointsPer100 > 0)
+    return `${item.rewardPointsPer100}X Points`;
+  return CATEGORY_META[item.categorySlug]?.multiplierFallback ?? "Rewards";
 }
 
 // Static fallback if API returns nothing
 const STATIC_FALLBACK: RecommendationMathData[] = [
-  { category: 'Dining & Delivery', icon: '🍽️', bestCard: 'HDFC Swiggy Credit Card', multiplier: '10% Cashback' },
-  { category: 'Travel & Flights',  icon: '✈️', bestCard: 'Axis Atlas Credit Card',  multiplier: '5X Miles' },
-  { category: 'Fuel Surcharge',    icon: '⛽', bestCard: 'BPCL SBI Octane',         multiplier: '25X Points' },
-  { category: 'Online Shopping',   icon: '🛍️', bestCard: 'SBI Cashback Credit Card', multiplier: '5% Cashback' },
-]
+  {
+    category: "Dining & Delivery",
+    icon: "🍽️",
+    bestCard: "HDFC Swiggy Credit Card",
+    multiplier: "10% Cashback",
+  },
+  {
+    category: "Travel & Flights",
+    icon: "✈️",
+    bestCard: "Axis Atlas Credit Card",
+    multiplier: "5X Miles",
+  },
+  {
+    category: "Fuel Surcharge",
+    icon: "⛽",
+    bestCard: "BPCL SBI Octane",
+    multiplier: "25X Points",
+  },
+  {
+    category: "Online Shopping",
+    icon: "🛍️",
+    bestCard: "SBI Cashback Credit Card",
+    multiplier: "5% Cashback",
+  },
+];
 
 export default function WalletPage() {
-  const [cards, setCards] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [editingCard, setEditingCard] = useState<any | null>(null)
-  const [activeMathRec, setActiveMathRec] = useState<RecommendationMathData | null>(null)
-
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingCard, setEditingCard] = useState<any | null>(null);
+  const [activeMathRec, setActiveMathRec] =
+    useState<RecommendationMathData | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState<string | null>(null);
+  const [isDeletingCard, setIsDeletingCard] = useState(false);
   // Live category tiles from API
-  const [recTiles, setRecTiles] = useState<RecommendationMathData[]>([])
-  const [recLoading, setRecLoading] = useState(true)
-  const [recSource, setRecSource] = useState<'live' | 'static'>('static')
+  const [recTiles, setRecTiles] = useState<RecommendationMathData[]>([]);
+  const [recLoading, setRecLoading] = useState(true);
+  const [recSource, setRecSource] = useState<"live" | "static">("static");
 
   // Horizontal scroll ref for recommendations
-  const recScrollRef = useRef<HTMLDivElement>(null)
-  const handleRecScroll = (direction: 'left' | 'right') => {
+  const recScrollRef = useRef<HTMLDivElement>(null);
+  const handleRecScroll = (direction: "left" | "right") => {
     if (recScrollRef.current) {
-      const offset = direction === 'left' ? -300 : 300
-      recScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+      const offset = direction === "left" ? -300 : 300;
+      recScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
     }
-  }
-
+  };
 
   const fetchCards = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/user-cards/me`, {
-        credentials: 'include',
-      })
+        credentials: "include",
+      });
 
       if (res.ok) {
-        const data = await res.json()
-        setCards(data)
+        const data = await res.json();
+        setCards(data);
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchCards()
-  }, [fetchCards])
+    fetchCards();
+  }, [fetchCards]);
 
   // Fetch live category tiles from Payload DB
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/cards/best-by-category`, {
-      credentials: 'include',
+      credentials: "include",
     })
       .then((r) => r.json())
       .then((data: BestCardByCategoryItem[]) => {
         if (Array.isArray(data) && data.length > 0) {
           const tiles: RecommendationMathData[] = data.map((item) => {
-            const meta = CATEGORY_META[item.categorySlug]
+            const meta = CATEGORY_META[item.categorySlug];
             return {
               category: meta?.label ?? item.category,
               categorySlug: item.categorySlug,
               cardName: item.cardName,
-              icon: meta?.icon ?? '💳',
+              icon: meta?.icon ?? "💳",
               bestCard: item.cardName,
               multiplier: getMultiplierLabel(item),
-            }
-          })
-          setRecTiles(tiles)
-          setRecSource('live')
+            };
+          });
+          setRecTiles(tiles);
+          setRecSource("live");
         } else {
           // API returned empty — no cards in DB with categories set yet
-          setRecTiles(STATIC_FALLBACK)
-          setRecSource('static')
+          setRecTiles(STATIC_FALLBACK);
+          setRecSource("static");
         }
       })
       .catch(() => {
-        setRecTiles(STATIC_FALLBACK)
-        setRecSource('static')
+        setRecTiles(STATIC_FALLBACK);
+        setRecSource("static");
       })
-      .finally(() => setRecLoading(false))
-  }, [])
+      .finally(() => setRecLoading(false));
+  }, []);
 
-  const deactivateCard = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this card from your wallet?')) return
+  const handleOpenDeleteModal = (id: string) => {
+    setCardToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDeactivate = async () => {
+    if (!cardToDelete) return;
+    setIsDeletingCard(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/user-cards/${id}/deactivate`, {
-        method: 'POST',
-        credentials: 'include',
-      })
+      const res = await fetch(
+        `${API_BASE_URL}/api/user-cards/${cardToDelete}/deactivate`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
       if (res.ok) {
-        fetchCards()
+        fetchCards();
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
+    } finally {
+      setIsDeletingCard(false);
+      setIsDeleteDialogOpen(false);
+      setCardToDelete(null);
     }
-  }
+  };
 
-  const activeCardsCount = cards.filter((c) => c.status === 'active').length
+  const activeCardsCount = cards.filter((c) => c.status === "active").length;
 
   return (
     <div className="wallet-page-wrapper">
@@ -149,7 +248,11 @@ export default function WalletPage() {
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to Dashboard
           </Link>
@@ -158,7 +261,10 @@ export default function WalletPage() {
         <header className="wallet-header">
           <div className="header-text">
             <h1>My Credit Cards</h1>
-            <p>Manage your linked credit cards, statement dates, and reward limits.</p>
+            <p>
+              Manage your linked credit cards, statement dates, and reward
+              limits.
+            </p>
           </div>
           <button
             type="button"
@@ -174,7 +280,11 @@ export default function WalletPage() {
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add Card
           </button>
@@ -222,8 +332,15 @@ export default function WalletPage() {
               </svg>
             </div>
             <h3>Your wallet is empty</h3>
-            <p>Add a credit card to track rewards, statement dates, and personalized card perks.</p>
-            <button type="button" className="btn-add" onClick={() => setIsAddModalOpen(true)}>
+            <p>
+              Add a credit card to track rewards, statement dates, and
+              personalized card perks.
+            </p>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={() => setIsAddModalOpen(true)}
+            >
               <svg
                 width="15"
                 height="15"
@@ -232,7 +349,11 @@ export default function WalletPage() {
                 strokeWidth="2"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Add Your First Card
             </button>
@@ -240,39 +361,46 @@ export default function WalletPage() {
         ) : (
           <div className="card-grid">
             {cards.map((card) => {
-              const isActive = card.status === 'active'
+              const isActive = card.status === "active";
 
               const cardObj =
-                typeof card.card === 'object' && card.card
+                typeof card.card === "object" && card.card
                   ? card.card
-                  : typeof card.creditCard === 'object' && card.creditCard
+                  : typeof card.creditCard === "object" && card.creditCard
                     ? card.creditCard
-                    : null
+                    : null;
 
               const bankName =
-                (typeof cardObj?.bank === 'object' && cardObj.bank?.name) ||
-                (typeof cardObj?.bank === 'string' && cardObj.bank) ||
+                (typeof cardObj?.bank === "object" && cardObj.bank?.name) ||
+                (typeof cardObj?.bank === "string" && cardObj.bank) ||
                 card.bankName ||
-                'Bank'
+                "Bank";
 
-              const cardName = cardObj?.name || card.cardName || 'Credit Card'
-              const displayName = card.displayName || null
-              const dueDay = card.paymentDueDay ?? card.billingCycleDay ?? null
+              const cardName = cardObj?.name || card.cardName || "Credit Card";
+              const displayName = card.displayName || null;
+              const dueDay = card.paymentDueDay ?? card.billingCycleDay ?? null;
               const physical =
-                typeof card.physicalCard === 'object' && card.physicalCard
+                typeof card.physicalCard === "object" && card.physicalCard
                   ? card.physicalCard
-                  : null
+                  : null;
 
               return (
-                <article key={card.id} className={`wallet-card ${!isActive ? 'inactive' : ''}`}>
+                <article
+                  key={card.id}
+                  className={`wallet-card ${!isActive ? "inactive" : ""}`}
+                >
                   <div className="card-top">
                     <div className="card-branding">
                       <span className="bank-name">{bankName}</span>
                       <h2 className="card-name">{displayName || cardName}</h2>
-                      {displayName && <span className="card-subtitle-type">{cardName}</span>}
+                      {displayName && (
+                        <span className="card-subtitle-type">{cardName}</span>
+                      )}
                     </div>
-                    <span className={`badge ${isActive ? 'status-active' : 'status-inactive'}`}>
-                      {isActive ? 'Active' : 'Inactive'}
+                    <span
+                      className={`badge ${isActive ? "status-active" : "status-inactive"}`}
+                    >
+                      {isActive ? "Active" : "Inactive"}
                     </span>
                   </div>
 
@@ -288,7 +416,14 @@ export default function WalletPage() {
                           strokeWidth="2.5"
                           aria-hidden="true"
                         >
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                          />
                           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                         </svg>
                         <span className="vault-pan">{physical.panMasked}</span>
@@ -296,11 +431,14 @@ export default function WalletPage() {
                       <div className="vault-meta">
                         {physical.expiryMonth && physical.expiryYear && (
                           <span className="vault-exp">
-                            Exp {String(physical.expiryMonth).padStart(2, '0')}/{String(physical.expiryYear).slice(-2)}
+                            Exp {String(physical.expiryMonth).padStart(2, "0")}/
+                            {String(physical.expiryYear).slice(-2)}
                           </span>
                         )}
                         {physical.brand && (
-                          <span className="vault-brand">{physical.brand.toUpperCase()}</span>
+                          <span className="vault-brand">
+                            {physical.brand.toUpperCase()}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -311,20 +449,24 @@ export default function WalletPage() {
                       <div className="detail-item">
                         <span className="detail-label">Credit Limit</span>
                         <span className="detail-value">
-                          ₹{Number(card.creditLimit).toLocaleString('en-IN')}
+                          ₹{Number(card.creditLimit).toLocaleString("en-IN")}
                         </span>
                       </div>
                     )}
                     {card.statementDay != null && (
                       <div className="detail-item">
                         <span className="detail-label">Statement Day</span>
-                        <span className="detail-value">{card.statementDay}th of month</span>
+                        <span className="detail-value">
+                          {card.statementDay}th of month
+                        </span>
                       </div>
                     )}
                     {dueDay != null && (
                       <div className="detail-item">
                         <span className="detail-label">Payment Due</span>
-                        <span className="detail-value">{dueDay}th of month</span>
+                        <span className="detail-value">
+                          {dueDay}th of month
+                        </span>
                       </div>
                     )}
                   </div>
@@ -356,7 +498,7 @@ export default function WalletPage() {
                       <button
                         type="button"
                         className="btn-card-action danger"
-                        onClick={() => deactivateCard(card.id)}
+                        onClick={() => handleOpenDeleteModal(card.id)}
                         id={`btn-remove-card-${card.id}`}
                       >
                         <svg
@@ -378,7 +520,7 @@ export default function WalletPage() {
                     )}
                   </div>
                 </article>
-              )
+              );
             })}
           </div>
         )}
@@ -389,7 +531,16 @@ export default function WalletPage() {
             <div className="wallet-rec-header-top">
               <div className="wallet-rec-title-wrap">
                 <h2 className="wallet-rec-title">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <circle cx="12" cy="12" r="10" />
                     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
                   </svg>
@@ -397,9 +548,9 @@ export default function WalletPage() {
                 </h2>
                 {!recLoading && (
                   <span
-                    className={`wallet-rec-live-badge ${recSource === 'live' ? 'is-live' : 'is-static'}`}
+                    className={`wallet-rec-live-badge ${recSource === "live" ? "is-live" : "is-static"}`}
                   >
-                    {recSource === 'live' ? '● Live from DB' : '● Static data'}
+                    {recSource === "live" ? "● Live from DB" : "● Static data"}
                   </span>
                 )}
               </div>
@@ -408,38 +559,79 @@ export default function WalletPage() {
                   <button
                     type="button"
                     className="wallet-scroll-btn"
-                    onClick={() => handleRecScroll('left')}
+                    onClick={() => handleRecScroll("left")}
                     aria-label="Scroll left"
                     title="Scroll left"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
                   <button
                     type="button"
                     className="wallet-scroll-btn"
-                    onClick={() => handleRecScroll('right')}
+                    onClick={() => handleRecScroll("right")}
                     aria-label="Scroll right"
                     title="Scroll right"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </button>
                 </div>
               )}
             </div>
-            <p className="wallet-rec-subtitle">See the exact maths behind each card recommendation</p>
+            <p className="wallet-rec-subtitle">
+              See the exact maths behind each card recommendation
+            </p>
           </div>
 
           {recLoading ? (
             <div className="wallet-rec-scroll-wrapper">
               <div className="wallet-rec-grid">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="wallet-rec-card" style={{ minHeight: 100 }}>
-                    <div style={{ height: 12, width: '60%', borderRadius: 6, background: 'rgba(108,76,241,0.1)', marginBottom: 8, animation: 'pulse 1.5s ease-in-out infinite' }} />
-                    <div style={{ height: 16, width: '80%', borderRadius: 6, background: 'rgba(108,76,241,0.07)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                  <div
+                    key={i}
+                    className="wallet-rec-card"
+                    style={{ minHeight: 100 }}
+                  >
+                    <div
+                      style={{
+                        height: 12,
+                        width: "60%",
+                        borderRadius: 6,
+                        background: "rgba(108,76,241,0.1)",
+                        marginBottom: 8,
+                        animation: "pulse 1.5s ease-in-out infinite",
+                      }}
+                    />
+                    <div
+                      style={{
+                        height: 16,
+                        width: "80%",
+                        borderRadius: 6,
+                        background: "rgba(108,76,241,0.07)",
+                        animation: "pulse 1.5s ease-in-out infinite",
+                      }}
+                    />
                     <style>{`@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}`}</style>
                   </div>
                 ))}
@@ -452,17 +644,30 @@ export default function WalletPage() {
                   <div key={rec.category} className="wallet-rec-card">
                     <div className="wallet-rec-card__top">
                       <span className="wallet-rec-card__icon">{rec.icon}</span>
-                      <span className="wallet-rec-card__category">{rec.category}</span>
-                      <span className="wallet-rec-card__multiplier">{rec.multiplier}</span>
+                      <span className="wallet-rec-card__category">
+                        {rec.category}
+                      </span>
+                      <span className="wallet-rec-card__multiplier">
+                        {rec.multiplier}
+                      </span>
                     </div>
                     <div className="wallet-rec-card__name">{rec.bestCard}</div>
                     <button
                       className="wallet-show-maths-btn"
-                      id={`wallet-show-maths-${rec.category.replace(/\s+/g, '-').replace(/&/g, 'and').toLowerCase()}`}
+                      id={`wallet-show-maths-${rec.category.replace(/\s+/g, "-").replace(/&/g, "and").toLowerCase()}`}
                       onClick={() => setActiveMathRec(rec)}
                       aria-label={`Show the maths behind ${rec.category} recommendation`}
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <rect x="4" y="2" width="16" height="20" rx="2" />
                         <line x1="8" y1="6" x2="16" y2="6" />
                         <line x1="8" y1="10" x2="10" y2="10" />
@@ -480,7 +685,8 @@ export default function WalletPage() {
             </div>
           )}
         </section>
-      </div>{/* end wallet-container */}
+      </div>
+      {/* end wallet-container */}
 
       {/* Interactive Modals */}
       <AddCardModal
@@ -503,6 +709,24 @@ export default function WalletPage() {
           onClose={() => setActiveMathRec(null)}
         />
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          if (!isDeletingCard) {
+            setIsDeleteDialogOpen(false);
+            setCardToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDeactivate}
+        title="Remove Card"
+        message="Are you sure you want to remove this card from your wallet?"
+        confirmText="Remove Card"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isDeletingCard}
+      />
     </div>
-  )
+  );
 }

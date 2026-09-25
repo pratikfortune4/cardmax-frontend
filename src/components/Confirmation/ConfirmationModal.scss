@@ -1,0 +1,409 @@
+// ==========================================================================
+// CardMax Confirmation Modal Stylesheet
+// Premium fintech aesthetic matching CardMax design system tokens
+// ==========================================================================
+
+$cm-font-sans: var(--font-inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+
+// Colors
+$cm-surface: #ffffff;
+$cm-surface-subtle: #f8fafc;
+$cm-surface-hover: #f1f5f9;
+
+$cm-text-primary: #0f172a;
+$cm-text-secondary: #475569;
+$cm-text-muted: #64748b;
+
+$cm-border: rgba(84, 120, 240, 0.14);
+$cm-border-subtle: #f1f4fa;
+$cm-border-standard: #e2e8f0;
+
+// Accents
+$cm-accent: #5478f0;
+$cm-accent-hover: #4064e0;
+$cm-accent-light: #eef2fe;
+$cm-accent-border: rgba(84, 120, 240, 0.25);
+
+// Danger / Destructive
+$cm-danger: #ef4444;
+$cm-danger-hover: #dc2626;
+$cm-danger-dark: #b91c1c;
+$cm-danger-light: #fef2f2;
+$cm-danger-border: #fecaca;
+
+// Warning
+$cm-warning: #f59e0b;
+$cm-warning-hover: #d97706;
+$cm-warning-light: #fffbeb;
+$cm-warning-border: #fde68a;
+
+// Radius & Shadows
+$cm-radius-modal: 18px;
+$cm-radius-btn: 10px;
+$cm-radius-badge: 12px;
+
+$cm-shadow-modal:
+  0 24px 50px -12px rgba(15, 23, 42, 0.22),
+  0 0 25px rgba(84, 120, 240, 0.08);
+
+// ─── Keyframe Animations ──────────────────────────────────────────────────────
+@keyframes cmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cmScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cmSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── Modal Overlay ────────────────────────────────────────────────────────────
+.confirmation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 1rem;
+  background-color: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: cmFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+  font-family: $cm-font-sans;
+  -webkit-font-smoothing: antialiased;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  // ─── Dialog Container ───────────────────────────────────────────────────────
+  .modal {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background-color: $cm-surface;
+    border: 1px solid $cm-border;
+    border-radius: $cm-radius-modal;
+    box-shadow: $cm-shadow-modal;
+    overflow: hidden;
+    animation: cmScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 480px) {
+      max-width: 100%;
+      border-radius: 16px;
+    }
+  }
+
+  // ─── Modal Content ──────────────────────────────────────────────────────────
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  // ─── Modal Header ───────────────────────────────────────────────────────────
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.85rem;
+    padding: 1.35rem 1.5rem 1rem;
+    border-bottom: 1px solid $cm-border-subtle;
+    background-color: $cm-surface;
+
+    @media (max-width: 480px) {
+      padding: 1.15rem 1.15rem 0.85rem;
+    }
+
+    .modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+      flex: 1;
+    }
+
+    // Icon Badges
+    .modal-icon-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: $cm-radius-badge;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+
+      svg {
+        display: block;
+      }
+
+      &.danger {
+        background-color: $cm-danger-light;
+        color: $cm-danger;
+        border: 1px solid $cm-danger-border;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+      }
+
+      &.warning {
+        background-color: $cm-warning-light;
+        color: $cm-warning;
+        border: 1px solid $cm-warning-border;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.12);
+      }
+
+      &.primary {
+        background-color: $cm-accent-light;
+        color: $cm-accent;
+        border: 1px solid $cm-accent-border;
+        box-shadow: 0 2px 8px rgba(84, 120, 240, 0.12);
+      }
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: $cm-text-primary;
+      letter-spacing: -0.015em;
+      line-height: 1.35;
+      word-break: break-word;
+
+      @media (max-width: 480px) {
+        font-size: 1.05rem;
+      }
+    }
+
+    // Close button
+    .close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid $cm-border-standard;
+      background: $cm-surface-subtle;
+      color: $cm-text-muted;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0;
+      margin-left: 0.25rem;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover:not(:disabled) {
+        background-color: $cm-danger-light;
+        color: $cm-danger;
+        border-color: $cm-danger-border;
+        transform: rotate(90deg);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+      }
+
+      &:active:not(:disabled) {
+        transform: rotate(90deg) scale(0.92);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // ─── Modal Body ─────────────────────────────────────────────────────────────
+  .modal-body {
+    padding: 1.25rem 1.5rem 1.35rem;
+
+    @media (max-width: 480px) {
+      padding: 1rem 1.15rem 1.15rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.885rem;
+      color: $cm-text-secondary;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+  }
+
+  // ─── Modal Footer ───────────────────────────────────────────────────────────
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 1rem 1.5rem 1.25rem;
+    background-color: $cm-surface-subtle;
+    border-top: 1px solid $cm-border-subtle;
+
+    @media (max-width: 480px) {
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+      padding: 0.9rem 1.15rem 1.15rem;
+    }
+
+    // Cancel Button
+    .cancel {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      padding: 0 1.15rem;
+      background-color: $cm-surface;
+      color: $cm-text-secondary;
+      border: 1px solid $cm-border-standard;
+      border-radius: $cm-radius-btn;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+
+      @media (max-width: 480px) {
+        width: 100%;
+        height: 40px;
+      }
+
+      &:hover:not(:disabled) {
+        background-color: $cm-surface-hover;
+        color: $cm-text-primary;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    // Confirm Button
+    .confirm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      height: 38px;
+      padding: 0 1.25rem;
+      border: none;
+      border-radius: $cm-radius-btn;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      @media (max-width: 480px) {
+        width: 100%;
+        height: 40px;
+      }
+
+      // Default & Danger variant
+      &,
+      &.danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+          box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+          transform: translateY(-1px);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+          box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+        }
+      }
+
+      // Warning variant
+      &.warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+          transform: translateY(-1px);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+      }
+
+      // Primary variant
+      &.primary {
+        background: linear-gradient(135deg, #5478f0 0%, #4064e0 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 10px rgba(84, 120, 240, 0.3);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #4064e0 0%, #3558dc 100%);
+          box-shadow: 0 4px 14px rgba(84, 120, 240, 0.4);
+          transform: translateY(-1px);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .confirm-btn-content {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .confirm-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: cmSpinner 0.65s linear infinite;
+      }
+    }
+  }
+}
