@@ -170,38 +170,60 @@ export default function WalletPage() {
     fetchCards();
   }, [fetchCards]);
 
-  // Fetch live category tiles from Payload DB
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/cards/best-by-category-v2`, {
-      credentials: "include",
-    })
-      .then((r) => r.json())
-      .then((data: BestCardByCategoryItem[]) => {
-        if (Array.isArray(data) && data.length > 0) {
-          const tiles: RecommendationMathData[] = data.map((item) => {
-            const meta = CATEGORY_META[item.categorySlug];
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFetchingPage, setIsFetchingPage] = useState(false);
+
+  const fetchRecommendations = async (page: number) => {
+    setIsFetchingPage(true);
+    setRecLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/dashboard?page=${page}`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.dashboard?.recommendations) {
+          const apiRecs = json.dashboard.recommendations.docs;
+          const tiles: RecommendationMathData[] = apiRecs.map((item: any) => {
             return {
-              category: meta?.label ?? item.category,
+              category: item.category,
               categorySlug: item.categorySlug,
               cardName: item.cardName,
-              icon: meta?.icon ?? "💳",
-              bestCard: item.cardName,
-              multiplier: getMultiplierLabel(item),
+              icon: item.icon || "💳",
+              bestCard: item.bestCard,
+              multiplier: item.multiplier,
             };
           });
           setRecTiles(tiles);
+          setCurrentPage(json.dashboard.recommendations.page);
+          setTotalPages(json.dashboard.recommendations.totalPages);
           setRecSource("live");
-        } else {
-          // API returned empty — no cards in DB with categories set yet
-          setRecTiles(STATIC_FALLBACK);
-          setRecSource("static");
+          
+          if (recScrollRef.current) {
+            recScrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+          }
         }
-      })
-      .catch(() => {
-        setRecTiles(STATIC_FALLBACK);
-        setRecSource("static");
-      })
-      .finally(() => setRecLoading(false));
+      }
+    } catch (err) {
+      setRecTiles(STATIC_FALLBACK);
+      setRecSource("static");
+    } finally {
+      setIsFetchingPage(false);
+      setRecLoading(false);
+    }
+  };
+
+  const handlePageChange = (direction: 'prev' | 'next') => {
+    let newPage = currentPage;
+    if (direction === 'prev' && currentPage > 1) newPage = currentPage - 1;
+    if (direction === 'next' && currentPage < totalPages) newPage = currentPage + 1;
+    if (newPage !== currentPage) fetchRecommendations(newPage);
+  };
+
+  // Fetch live category tiles from Payload DB on mount
+  useEffect(() => {
+    fetchRecommendations(1);
   }, []);
 
   const handleOpenDeleteModal = (id: string) => {
@@ -554,14 +576,16 @@ export default function WalletPage() {
                   </span>
                 )}
               </div>
-              {recTiles.length > 3 && (
+              {totalPages > 1 && (
                 <div className="wallet-rec-scroll-controls">
                   <button
                     type="button"
                     className="wallet-scroll-btn"
-                    onClick={() => handleRecScroll("left")}
-                    aria-label="Scroll left"
-                    title="Scroll left"
+                    onClick={() => handlePageChange("prev")}
+                    disabled={currentPage === 1 || isFetchingPage}
+                    aria-label="Previous page"
+                    title="Previous page"
+                    style={{ opacity: (currentPage === 1 || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === 1 || isFetchingPage) ? 'not-allowed' : 'pointer' }}
                   >
                     <svg
                       width="14"
@@ -576,12 +600,17 @@ export default function WalletPage() {
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                    {isFetchingPage ? '...' : `${currentPage} / ${totalPages}`}
+                  </span>
                   <button
                     type="button"
                     className="wallet-scroll-btn"
-                    onClick={() => handleRecScroll("right")}
-                    aria-label="Scroll right"
-                    title="Scroll right"
+                    onClick={() => handlePageChange("next")}
+                    disabled={currentPage === totalPages || isFetchingPage}
+                    aria-label="Next page"
+                    title="Next page"
+                    style={{ opacity: (currentPage === totalPages || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === totalPages || isFetchingPage) ? 'not-allowed' : 'pointer' }}
                   >
                     <svg
                       width="14"

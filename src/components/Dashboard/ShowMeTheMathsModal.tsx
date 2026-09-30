@@ -188,7 +188,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
       ? `&card=${encodeURIComponent(recommendation.cardName || bestCard)}`
       : ''
     fetch(
-      `${API_BASE_URL}/api/cards/best-by-category-v2?category=${encodeURIComponent(slug)}${cardParam}`,
+      `${API_BASE_URL}/api/cards/best-by-category?category=${encodeURIComponent(slug)}${cardParam}`,
       {
         credentials: 'include',
       },
