@@ -5,6 +5,8 @@ import Link from 'next/link'
 import ShowMeTheMathsModal, { type RecommendationMathData } from './ShowMeTheMathsModal'
 import '@/app/home.scss'
 
+import { API_BASE_URL } from '@/lib/api'
+
 export interface DashboardData {
   user: {
     name: string
@@ -23,16 +25,22 @@ export interface DashboardData {
     }
   }
   gmailConnected: boolean
-  recommendations: Array<{
-    category: string
-    categorySlug?: string
-    cardName?: string
-    icon: string
-    bestCard: string
-    multiplier: string
-    perkSummary: string
-    isOwned: boolean
-  }>
+  recommendations: {
+    docs: Array<{
+      category: string
+      categorySlug?: string
+      cardName?: string
+      icon: string
+      bestCard: string
+      multiplier: string
+      perkSummary: string
+      isOwned: boolean
+    }>
+    page: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }
   recentStatementsCount: number
 }
 
@@ -64,22 +72,46 @@ const getCategoryIcon = (icon?: string): string => {
   return iconMap[icon.toLowerCase()] || icon
 }
 
+
 export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
   const { user, metrics, gmailConnected, recommendations } = data
 
-  // Scroll ref for horizontal scrolling
+  const [currentPage, setCurrentPage] = useState(recommendations.page || 1);
+  const [totalPages, setTotalPages] = useState(recommendations.totalPages || 1);
+  const [paginatedRecommendations, setPaginatedRecommendations] = useState(recommendations.docs || []);
+  const [isFetchingPage, setIsFetchingPage] = useState(false);
+
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
 
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640
-      const scrollStep = isMobile
-        ? scrollContainerRef.current.clientWidth * 0.85
-        : 320
-      const offset = direction === 'left' ? -scrollStep : scrollStep
-      scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+  const handlePageChange = async (direction: 'prev' | 'next') => {
+    let newPage = currentPage;
+    if (direction === 'prev' && currentPage > 1) newPage = currentPage - 1;
+    if (direction === 'next' && currentPage < totalPages) newPage = currentPage + 1;
+    
+    if (newPage === currentPage) return;
+    
+    setIsFetchingPage(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/dashboard?page=${newPage}`, {
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.dashboard?.recommendations) {
+          setPaginatedRecommendations(json.dashboard.recommendations.docs);
+          setCurrentPage(json.dashboard.recommendations.page);
+          setTotalPages(json.dashboard.recommendations.totalPages);
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch next page", e);
+    } finally {
+      setIsFetchingPage(false);
     }
-  }
+  };
 
   // Modal state — null means closed, otherwise holds the active recommendation
   const [activeMathRec, setActiveMathRec] = useState<RecommendationMathData | null>(null)
@@ -265,20 +297,27 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
                   <button
                     type="button"
                     className="cm-scroll-btn"
-                    onClick={() => handleScroll('left')}
-                    aria-label="Scroll left"
-                    title="Scroll left"
+                    onClick={() => handlePageChange('prev')}
+                    disabled={currentPage === 1 || isFetchingPage}
+                    aria-label="Previous page"
+                    title="Previous page"
+                    style={{ opacity: (currentPage === 1 || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === 1 || isFetchingPage) ? 'not-allowed' : 'pointer' }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                    {isFetchingPage ? '...' : `${currentPage} / ${totalPages}`}
+                  </span>
                   <button
                     type="button"
                     className="cm-scroll-btn"
-                    onClick={() => handleScroll('right')}
-                    aria-label="Scroll right"
-                    title="Scroll right"
+                    onClick={() => handlePageChange('next')}
+                    disabled={currentPage === totalPages || isFetchingPage}
+                    aria-label="Next page"
+                    title="Next page"
+                    style={{ opacity: (currentPage === totalPages || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === totalPages || isFetchingPage) ? 'not-allowed' : 'pointer' }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6" />
@@ -290,8 +329,8 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
 
             <div className="cm-categories-scroll-wrapper">
               <div className="cm-categories-grid" ref={scrollContainerRef}>
-                {recommendations.map((rec) => (
-                  <div key={rec.category} className="cm-category-card">
+                {paginatedRecommendations.map((rec, index) => (
+                  <div key={`${rec.category}-${index}`} className="cm-category-card">
                     <div className="cm-cat-top">
                       <span className="cm-cat-title">
                         <span className="cm-cat-emoji">{getCategoryIcon(rec.icon)}</span>
