@@ -172,7 +172,7 @@ export default function WalletPage() {
 
   // Fetch live category tiles from Payload DB
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/cards/best-by-category`, {
+    fetch(`${API_BASE_URL}/api/cards/best-by-category-v2`, {
       credentials: "include",
     })
       .then((r) => r.json())

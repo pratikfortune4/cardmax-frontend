@@ -5,7 +5,7 @@
  * An interactive drill-down modal that visualizes exactly why a card is
  * recommended and the annual value gap vs. a baseline card.
  *
- * Data source: GET /api/cards/best-by-category?category=<slug>
+ * Data source: GET /api/cards/best-by-category-v2?category=<slug>
  * Falls back to cardRates.ts static data if API returns nothing.
  *
  * Trigger: Pass a `recommendation` object + `onClose` handler.
@@ -188,7 +188,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
       ? `&card=${encodeURIComponent(recommendation.cardName || bestCard)}`
       : ''
     fetch(
-      `${API_BASE_URL}/api/cards/best-by-category?category=${encodeURIComponent(slug)}${cardParam}`,
+      `${API_BASE_URL}/api/cards/best-by-category-v2?category=${encodeURIComponent(slug)}${cardParam}`,
       {
         credentials: 'include',
       },
