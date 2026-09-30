@@ -669,8 +669,8 @@ export default function WalletPage() {
           ) : (
             <div className="wallet-rec-scroll-wrapper">
               <div className="wallet-rec-grid" ref={recScrollRef}>
-                {recTiles.map((rec) => (
-                  <div key={rec.category} className="wallet-rec-card">
+                {recTiles.map((rec, idx) => (
+                  <div key={`${rec.category}-${rec.bestCard}-${idx}`} className="wallet-rec-card">
                     <div className="wallet-rec-card__top">
                       <span className="wallet-rec-card__icon">{rec.icon}</span>
                       <span className="wallet-rec-card__category">

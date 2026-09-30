@@ -306,7 +306,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
         if (selectedCard?.cardType) vaultPayload.cardType = selectedCard.cardType
         if (displayName.trim()) vaultPayload.nickname = displayName.trim()
 
-        const vaultRes = await fetch(`${API_BASE_URL}/api/cards/add`, {
+        const vaultRes = await fetch(`${API_BASE_URL}/api/vault-cards/add`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

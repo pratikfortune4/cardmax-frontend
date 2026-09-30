@@ -13,7 +13,7 @@ import { ConfirmationModal } from "../Confirmation/ConfirmationModal";
  * PCI safety rules implemented here:
  * - Only masked PANs (`panMasked`) are ever fetched/rendered for the list.
  * - The full PAN is requested ONLY through an authenticated API call
- *   (`POST /api/cards/:id/reveal`) and kept in React state for a short,
+ *   (`POST /api/vault-cards/:id/reveal`) and kept in React state for a short,
  *   fixed window before being cleared automatically.
  * - The full PAN is never written to localStorage/sessionStorage, never placed
  *   in URLs, never sent to analytics, and never logged.
@@ -31,7 +31,7 @@ interface CardView {
   expiryYear?: number | null;
 }
 
-/** One bank master option served by GET /api/cards/banks for the dropdown.. */
+/** One bank master option served by GET /api/vault-cards/banks for the dropdown.. */
 interface BankOption {
   id: string;
   name: string;
@@ -156,7 +156,7 @@ export const MyCards = () => {
     if (!silent) setLoading(true);
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/cards?limit=100&sort=-updatedAt`,
+        `${API_BASE_URL}/api/vault-cards?limit=100&sort=-updatedAt`,
         {
           credentials: "include",
         },
@@ -175,13 +175,13 @@ export const MyCards = () => {
   }, [loadCards]);
 
   // Bank master options for the add-card dropdown — served by the secure card
-  // API (GET /api/cards/banks); the banks collection itself is not user-readable
+  // API (GET /api/vault-cards/banks); the banks collection itself is not user-readable
   // (payload-gatekeeper restricts it to admin roles)..
   useEffect(() => {
     let cancelled = false;
     const loadBanks = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/cards/banks`, {
+        const res = await fetch(`${API_BASE_URL}/api/vault-cards/banks`, {
           credentials: "include",
         });
         const data = (await res.json().catch(() => ({}))) as {
@@ -216,7 +216,7 @@ export const MyCards = () => {
     const year = Number(expiryYear);
     try {
       setSaving(true);
-      const data = await postJson("/api/cards/add", {
+      const data = await postJson("/api/vault-cards/add", {
         pan: cardNumber,
         cardholderName,
         expiryMonth: month,
@@ -254,7 +254,7 @@ export const MyCards = () => {
     setRevealingId(id);
     try {
       const data = await postJson(
-        `/api/cards/${encodeURIComponent(id)}/reveal`,
+        `/api/vault-cards/${encodeURIComponent(id)}/reveal`,
         {},
       );
       if (data.error) {
@@ -277,7 +277,7 @@ export const MyCards = () => {
     clearRevealed();
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/cards/${encodeURIComponent(deleteCardId)}`,
+        `${API_BASE_URL}/api/vault-cards/${encodeURIComponent(deleteCardId)}`,
         {
           method: "DELETE",
           credentials: "include",
