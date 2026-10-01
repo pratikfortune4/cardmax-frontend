@@ -80,7 +80,7 @@ export const GmailForm = () => {
   const handleConfirmDisconnect = async () => {
     setDisconnecting(true)
     setError('')
-    setIngestResult(null)
+    setSyncResult(null)
     try {
       const res = await fetch(`${API_BASE_URL}/api/users/gmail/disconnect`, {
         method: 'POST',
