@@ -1,291 +1,311 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { API_BASE_URL } from '@/lib/api'
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 export interface MasterCardOption {
-  id: string
-  name: string
+  id: string;
+  name: string;
   bank?:
-  | {
-    id?: string
-    name?: string
-  }
-  | string
-  cardType?: string
-  network?: string
+    | {
+        id?: string;
+        name?: string;
+      }
+    | string;
+  cardType?: string;
+  network?: string;
 }
 
 interface AddCardModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onCardAdded: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onCardAdded: () => void;
 }
 
 function formatPan(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 19)
-  return digits.replace(/(\d{4})(?=\d)/g, '$1 ')
+  const digits = value.replace(/\D/g, "").slice(0, 19);
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
 }
 
 function detectCardBrand(digits: string): string {
-  const clean = digits.replace(/\D/g, '')
-  if (/^4/.test(clean)) return 'visa'
-  if (/^3[47]/.test(clean)) return 'amex'
-  if (/^(5[1-5]|2(2[2-9]|[3-6]|7[01]|720))/.test(clean)) return 'mastercard'
-  if (/^(60|65|81|82|508|50|36|38|39|63)/.test(clean)) return 'rupay'
-  if (/^6(?:011|5|4[4-9]|22)/.test(clean)) return 'discover'
-  return ''
+  const clean = digits.replace(/\D/g, "");
+  if (/^4/.test(clean)) return "visa";
+  if (/^3[47]/.test(clean)) return "amex";
+  if (/^(5[1-5]|2(2[2-9]|[3-6]|7[01]|720))/.test(clean)) return "mastercard";
+  if (/^(60|65|81|82|508|50|36|38|39|63)/.test(clean)) return "rupay";
+  if (/^6(?:011|5|4[4-9]|22)/.test(clean)) return "discover";
+  return "";
 }
 
 function isValidLuhn(digits: string): boolean {
-  const clean = digits.replace(/\D/g, '')
-  if (!/^\d{12,19}$/.test(clean)) return false
-  let sum = 0
-  let double = false
+  const clean = digits.replace(/\D/g, "");
+  if (!/^\d{12,19}$/.test(clean)) return false;
+  let sum = 0;
+  let double = false;
   for (let i = clean.length - 1; i >= 0; i--) {
-    let d = clean.charCodeAt(i) - 48
+    let d = clean.charCodeAt(i) - 48;
     if (double) {
-      d *= 2
-      if (d >= 10) d -= 9
+      d *= 2;
+      if (d >= 10) d -= 9;
     }
-    sum += d
-    double = !double
+    sum += d;
+    double = !double;
   }
-  return sum % 10 === 0
+  return sum % 10 === 0;
 }
 
-const currentYear = new Date().getFullYear()
-const EXPIRY_YEARS = Array.from({ length: 16 }, (_, i) => currentYear + i)
+const currentYear = new Date().getFullYear();
+const EXPIRY_YEARS = Array.from({ length: 16 }, (_, i) => currentYear + i);
 const EXPIRY_MONTHS = [
-  { label: '01 - Jan', value: '1' },
-  { label: '02 - Feb', value: '2' },
-  { label: '03 - Mar', value: '3' },
-  { label: '04 - Apr', value: '4' },
-  { label: '05 - May', value: '5' },
-  { label: '06 - Jun', value: '6' },
-  { label: '07 - Jul', value: '7' },
-  { label: '08 - Aug', value: '8' },
-  { label: '09 - Sep', value: '9' },
-  { label: '10 - Oct', value: '10' },
-  { label: '11 - Nov', value: '11' },
-  { label: '12 - Dec', value: '12' },
-]
+  { label: "01 - Jan", value: "1" },
+  { label: "02 - Feb", value: "2" },
+  { label: "03 - Mar", value: "3" },
+  { label: "04 - Apr", value: "4" },
+  { label: "05 - May", value: "5" },
+  { label: "06 - Jun", value: "6" },
+  { label: "07 - Jul", value: "7" },
+  { label: "08 - Aug", value: "8" },
+  { label: "09 - Sep", value: "9" },
+  { label: "10 - Oct", value: "10" },
+  { label: "11 - Nov", value: "11" },
+  { label: "12 - Dec", value: "12" },
+];
 
-export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardModalProps) {
-  const [catalog, setCatalog] = useState<MasterCardOption[]>([])
-  const [catalogLoading, setCatalogLoading] = useState(false)
-  const [catalogError, setCatalogError] = useState<string | null>(null)
+export default function AddCardModal({
+  isOpen,
+  onClose,
+  onCardAdded,
+}: AddCardModalProps) {
+  const [catalog, setCatalog] = useState<MasterCardOption[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
 
   // Wallet Metadata Form State
-  const [selectedCardId, setSelectedCardId] = useState<string>('')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [displayName, setDisplayName] = useState('')
-  const [creditLimitRaw, setCreditLimitRaw] = useState('')
-  const [statementDay, setStatementDay] = useState<number | ''>('')
-  const [paymentDueDay, setPaymentDueDay] = useState<number | ''>('')
-  const [submitting, setSubmitting] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
+  const [selectedCardId, setSelectedCardId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [creditLimitRaw, setCreditLimitRaw] = useState("");
+  const [statementDay, setStatementDay] = useState<number | "">("");
+  const [paymentDueDay, setPaymentDueDay] = useState<number | "">("");
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Secure Physical Card Vault State (Optional)
-  const [saveToVault, setSaveToVault] = useState(false)
-  const [cardNumber, setCardNumber] = useState('')
-  const [cardholderName, setCardholderName] = useState('')
-  const [expiryMonth, setExpiryMonth] = useState('')
-  const [expiryYear, setExpiryYear] = useState('')
+  const [saveToVault, setSaveToVault] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardholderName, setCardholderName] = useState("");
+  const [expiryMonth, setExpiryMonth] = useState("");
+  const [expiryYear, setExpiryYear] = useState("");
 
   // Fetch CreditCard catalog on modal open
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
-    let isMounted = true
-    setCatalogLoading(true)
-    setCatalogError(null)
+    let isMounted = true;
+    setCatalogLoading(true);
+    setCatalogError(null);
 
     const fetchCatalog = async () => {
       try {
-        let docs: MasterCardOption[] = []
+        let docs: MasterCardOption[] = [];
         // Priority 1: dedicated user-cards/catalog endpoint
         const res = await fetch(`${API_BASE_URL}/api/user-cards/catalog`, {
-          credentials: 'include',
-        })
+          credentials: "include",
+        });
         if (res.ok) {
-          const data = await res.json()
-          docs = Array.isArray(data) ? data : data.docs || []
+          const data = await res.json();
+          docs = Array.isArray(data) ? data : data.docs || [];
         } else {
           // Priority 2: direct CreditCard collection endpoint
-          const fallbackRes = await fetch(`${API_BASE_URL}/api/CreditCard?limit=100&depth=1`, {
-            credentials: 'include',
-          })
+          const fallbackRes = await fetch(
+            `${API_BASE_URL}/api/CreditCard?limit=100&depth=1`,
+            {
+              credentials: "include",
+            },
+          );
           if (fallbackRes.ok) {
-            const data = await fallbackRes.json()
-            docs = data.docs || []
+            const data = await fallbackRes.json();
+            docs = data.docs || [];
           } else {
-            if (isMounted) setCatalogError('Could not load card catalog.')
-            return
+            if (isMounted) setCatalogError("Could not load card catalog.");
+            return;
           }
         }
 
         if (isMounted) {
-          const validCards = docs.filter((c) => Boolean(c && c.name))
-          setCatalog(validCards)
+          const validCards = docs.filter((c) => Boolean(c && c.name));
+          setCatalog(validCards);
         }
       } catch (err) {
         if (isMounted) {
-          setCatalogError('Failed to fetch credit cards.')
+          setCatalogError("Failed to fetch credit cards.");
         }
       } finally {
         if (isMounted) {
-          setCatalogLoading(false)
+          setCatalogLoading(false);
         }
       }
-    }
+    };
 
-    fetchCatalog()
+    fetchCatalog();
 
     return () => {
-      isMounted = false
-    }
-  }, [isOpen])
+      isMounted = false;
+    };
+  }, [isOpen]);
 
   // Reset form when modal closes or opens
   useEffect(() => {
     if (isOpen) {
-      setSelectedCardId('')
-      setSearchQuery('')
-      setDisplayName('')
-      setCreditLimitRaw('')
-      setStatementDay('')
-      setPaymentDueDay('')
-      setFormError(null)
-      setSaveToVault(false)
-      setCardNumber('')
-      setCardholderName('')
-      setExpiryMonth('')
-      setExpiryYear('')
+      setSelectedCardId("");
+      setSearchQuery("");
+      setDisplayName("");
+      setCreditLimitRaw("");
+      setStatementDay("");
+      setPaymentDueDay("");
+      setFormError(null);
+      setSaveToVault(false);
+      setCardNumber("");
+      setCardholderName("");
+      setExpiryMonth("");
+      setExpiryYear("");
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // ESC key handler to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose()
+      if (e.key === "Escape" && isOpen) {
+        onClose();
       }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Filter catalog based on search query
   const filteredCards = useMemo(() => {
-    if (!searchQuery.trim()) return catalog
-    const q = searchQuery.toLowerCase().trim()
+    if (!searchQuery.trim()) return catalog;
+    const q = searchQuery.toLowerCase().trim();
     return catalog.filter((card) => {
-      const cardName = (card.name || '').toLowerCase()
+      const cardName = (card.name || "").toLowerCase();
       const bankName =
-        typeof card.bank === 'object' && card.bank?.name
+        typeof card.bank === "object" && card.bank?.name
           ? card.bank.name.toLowerCase()
-          : typeof card.bank === 'string'
+          : typeof card.bank === "string"
             ? card.bank.toLowerCase()
-            : ''
-      return cardName.includes(q) || bankName.includes(q)
-    })
-  }, [catalog, searchQuery])
+            : "";
+      return cardName.includes(q) || bankName.includes(q);
+    });
+  }, [catalog, searchQuery]);
 
   // Currently selected card object
   const selectedCard = useMemo(
     () => catalog.find((c) => c.id === selectedCardId),
     [catalog, selectedCardId],
-  )
+  );
 
   // Credit limit formatting helper
   const formattedLimitPreview = useMemo(() => {
-    const num = parseInt(creditLimitRaw.replace(/\D/g, ''), 10)
-    return isNaN(num) ? '' : num.toLocaleString('en-IN')
-  }, [creditLimitRaw])
+    const num = parseInt(creditLimitRaw.replace(/\D/g, ""), 10);
+    return isNaN(num) ? "" : num.toLocaleString("en-IN");
+  }, [creditLimitRaw]);
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericOnly = e.target.value.replace(/\D/g, '')
-    setCreditLimitRaw(numericOnly)
-  }
+    const numericOnly = e.target.value.replace(/\D/g, "");
+    setCreditLimitRaw(numericOnly);
+  };
 
   // PAN change with automatic spacing
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardNumber(formatPan(e.target.value))
-  }
+    setCardNumber(formatPan(e.target.value));
+  };
 
   // Detected brand from PAN
-  const detectedBrand = useMemo(() => detectCardBrand(cardNumber), [cardNumber])
+  const detectedBrand = useMemo(
+    () => detectCardBrand(cardNumber),
+    [cardNumber],
+  );
 
   // Auto-calculate Payment Due Day as statementDay + 20 days
   const handleAutoCalculateDueDay = useCallback(() => {
-    if (typeof statementDay === 'number' && statementDay >= 1 && statementDay <= 31) {
-      let due = statementDay + 20
-      if (due > 30) due = due - 30
-      setPaymentDueDay(due)
+    if (
+      typeof statementDay === "number" &&
+      statementDay >= 1 &&
+      statementDay <= 31
+    ) {
+      let due = statementDay + 20;
+      if (due > 30) due = due - 30;
+      setPaymentDueDay(due);
     }
-  }, [statementDay])
+  }, [statementDay]);
 
   // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormError(null)
+    e.preventDefault();
+    setFormError(null);
 
     if (!selectedCardId) {
-      setFormError('Please select a credit card from the catalog.')
-      return
+      setFormError("Please select a credit card from the catalog.");
+      return;
     }
 
-    const limitNum = creditLimitRaw ? parseInt(creditLimitRaw, 10) : undefined
+    const limitNum = creditLimitRaw ? parseInt(creditLimitRaw, 10) : undefined;
     if (limitNum !== undefined && (isNaN(limitNum) || limitNum < 0)) {
-      setFormError('Please enter a valid credit limit.')
-      return
+      setFormError("Please enter a valid credit limit.");
+      return;
     }
 
-    if (statementDay !== '' && (statementDay < 1 || statementDay > 31)) {
-      setFormError('Statement day must be between 1 and 31.')
-      return
+    if (statementDay !== "" && (statementDay < 1 || statementDay > 31)) {
+      setFormError("Statement day must be between 1 and 31.");
+      return;
     }
 
-    if (paymentDueDay !== '' && (paymentDueDay < 1 || paymentDueDay > 31)) {
-      setFormError('Payment due day must be between 1 and 31.')
-      return
+    if (paymentDueDay !== "" && (paymentDueDay < 1 || paymentDueDay > 31)) {
+      setFormError("Payment due day must be between 1 and 31.");
+      return;
     }
 
     // Vault validation if saveToVault is active
-    const cleanPan = cardNumber.replace(/\D/g, '')
+    const cleanPan = cardNumber.replace(/\D/g, "");
     if (saveToVault) {
       if (!cleanPan) {
-        setFormError('Please enter your card number to save it in the vault.')
-        return
+        setFormError("Please enter your card number to save it in the vault.");
+        return;
       }
       if (!isValidLuhn(cleanPan)) {
-        setFormError('The card number is invalid. Please double-check the digits.')
-        return
+        setFormError(
+          "The card number is invalid. Please double-check the digits.",
+        );
+        return;
       }
       if (!cardholderName.trim()) {
-        setFormError('Please enter the name on the card.')
-        return
+        setFormError("Please enter the name on the card.");
+        return;
       }
-      const expM = parseInt(expiryMonth, 10)
-      const expY = parseInt(expiryYear, 10)
+      const expM = parseInt(expiryMonth, 10);
+      const expY = parseInt(expiryYear, 10);
       if (isNaN(expM) || expM < 1 || expM > 12) {
-        setFormError('Please select a valid expiry month.')
-        return
+        setFormError("Please select a valid expiry month.");
+        return;
       }
-      const now = new Date()
-      const curYear = now.getFullYear()
-      const curMonth = now.getMonth() + 1
-      if (isNaN(expY) || expY < curYear || (expY === curYear && expM < curMonth)) {
-        setFormError('The card expiration date must be in the future.')
-        return
+      const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth() + 1;
+      if (
+        isNaN(expY) ||
+        expY < curYear ||
+        (expY === curYear && expM < curMonth)
+      ) {
+        setFormError("The card expiration date must be in the future.");
+        return;
       }
     }
 
-    setSubmitting(true)
+    setSubmitting(true);
 
     try {
-      let physicalCardId: string | null = null
+      let physicalCardId: string | null = null;
 
       // Step 1: If vault is enabled, securely encrypt & store in Cards vault
       if (saveToVault) {
@@ -294,85 +314,95 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
           cardholderName: cardholderName.trim(),
           expiryMonth: parseInt(expiryMonth, 10),
           expiryYear: parseInt(expiryYear, 10),
-        }
+        };
 
         const bId =
-          typeof selectedCard?.bank === 'object' && selectedCard?.bank && 'id' in selectedCard.bank
+          typeof selectedCard?.bank === "object" &&
+          selectedCard?.bank &&
+          "id" in selectedCard.bank
             ? (selectedCard.bank as { id: string }).id
-            : typeof selectedCard?.bank === 'string'
+            : typeof selectedCard?.bank === "string"
               ? selectedCard.bank
-              : null
-        if (bId) vaultPayload.bank = bId
-        if (selectedCard?.cardType) vaultPayload.cardType = selectedCard.cardType
-        if (displayName.trim()) vaultPayload.nickname = displayName.trim()
+              : null;
+        if (bId) vaultPayload.bank = bId;
+        if (selectedCard?.cardType)
+          vaultPayload.cardType = selectedCard.cardType;
+        if (displayName.trim()) vaultPayload.nickname = displayName.trim();
 
         const vaultRes = await fetch(`${API_BASE_URL}/api/vault-cards/add`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          credentials: 'include',
+          credentials: "include",
           body: JSON.stringify(vaultPayload),
-        })
+        });
 
-        const vaultData = await vaultRes.json().catch(() => ({}))
+        const vaultData = await vaultRes.json().catch(() => ({}));
         if (!vaultRes.ok) {
-          throw new Error(vaultData.error || 'Failed to securely store card in vault.')
+          throw new Error(
+            vaultData.error || "Failed to securely store card in vault.",
+          );
         }
 
-        physicalCardId = vaultData.card?.id ?? null
+        physicalCardId = vaultData.card?.id ?? null;
       }
 
       // Step 2: Create UserCard wallet entry (linked to physicalCard if created)
       const payload: Record<string, unknown> = {
         card: selectedCardId,
-        status: 'active',
-      }
+        status: "active",
+      };
 
-      if (displayName.trim()) payload.displayName = displayName.trim()
-      if (limitNum !== undefined) payload.creditLimit = limitNum
-      if (typeof statementDay === 'number') payload.statementDay = statementDay
-      if (typeof paymentDueDay === 'number') {
-        payload.paymentDueDay = paymentDueDay
-        payload.billingCycleDay = paymentDueDay
+      if (displayName.trim()) payload.displayName = displayName.trim();
+      if (limitNum !== undefined) payload.creditLimit = limitNum;
+      if (typeof statementDay === "number") payload.statementDay = statementDay;
+      if (typeof paymentDueDay === "number") {
+        payload.paymentDueDay = paymentDueDay;
+        payload.billingCycleDay = paymentDueDay;
       }
       if (physicalCardId) {
-        payload.physicalCard = physicalCardId
+        payload.physicalCard = physicalCardId;
       }
 
       const res = await fetch(`${API_BASE_URL}/api/user-cards`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(payload),
-      })
+      });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}))
+        const errorData = await res.json().catch(() => ({}));
         throw new Error(
-          errorData.errors?.[0]?.message || errorData.error || 'Failed to link card to wallet.',
-        )
+          errorData.errors?.[0]?.message ||
+            errorData.error ||
+            "Failed to link card to wallet.",
+        );
       }
 
-      onCardAdded()
-      onClose()
+      onCardAdded();
+      onClose();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'An error occurred while adding the card.'
-      setFormError(msg)
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while adding the card.";
+      setFormError(msg);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const getBankName = (card: MasterCardOption): string => {
-    if (typeof card.bank === 'object' && card.bank?.name) return card.bank.name
-    if (typeof card.bank === 'string') return card.bank
-    return 'Bank'
-  }
+    if (typeof card.bank === "object" && card.bank?.name) return card.bank.name;
+    if (typeof card.bank === "string") return card.bank;
+    return "Bank";
+  };
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
@@ -387,7 +417,8 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
           <div className="modal-title-wrap">
             <h2 id="add-card-modal-title">Add Card to Wallet</h2>
             <p className="modal-subtitle">
-              Select a card from the catalog, configure billing details, and optionally vault your physical card.
+              Select a card from the catalog, configure billing details, and
+              optionally vault your physical card.
             </p>
           </div>
           <button
@@ -442,15 +473,19 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
             {selectedCard ? (
               <div className="selected-card-banner">
                 <div className="selected-card-info">
-                  <span className="selected-bank">{getBankName(selectedCard)}</span>
-                  <strong className="selected-name">{selectedCard.name || 'Credit Card'}</strong>
+                  <span className="selected-bank">
+                    {getBankName(selectedCard)}
+                  </span>
+                  <strong className="selected-name">
+                    {selectedCard.name || "Credit Card"}
+                  </strong>
                 </div>
                 <button
                   type="button"
                   className="btn-change-selection"
                   onClick={() => {
-                    setSelectedCardId('')
-                    setSearchQuery('')
+                    setSelectedCardId("");
+                    setSearchQuery("");
                   }}
                 >
                   Change Card
@@ -486,7 +521,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                     <button
                       type="button"
                       className="search-clear-btn"
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => setSearchQuery("")}
                       aria-label="Clear search"
                     >
                       ×
@@ -494,7 +529,11 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                   )}
                 </div>
 
-                <div className="catalog-list" role="listbox" aria-label="Available credit cards">
+                <div
+                  className="catalog-list"
+                  role="listbox"
+                  aria-label="Available credit cards"
+                >
                   {catalogLoading ? (
                     <div className="catalog-status">
                       <span className="btn-spinner dark" />
@@ -508,7 +547,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                     </div>
                   ) : (
                     filteredCards.map((card) => {
-                      const bank = getBankName(card)
+                      const bank = getBankName(card);
                       return (
                         <button
                           key={card.id}
@@ -520,13 +559,17 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                         >
                           <div className="catalog-item-text">
                             <span className="catalog-item-bank">{bank}</span>
-                            <span className="catalog-item-name">{card.name || 'Credit Card'}</span>
+                            <span className="catalog-item-name">
+                              {card.name || "Credit Card"}
+                            </span>
                           </div>
                           {card.network && (
-                            <span className="catalog-network-tag">{card.network}</span>
+                            <span className="catalog-network-tag">
+                              {card.network}
+                            </span>
                           )}
                         </button>
-                      )
+                      );
                     })
                   )}
                 </div>
@@ -562,15 +605,23 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                 type="text"
                 inputMode="numeric"
                 placeholder="e.g., 1,50,000"
-                value={creditLimitRaw ? parseInt(creditLimitRaw, 10).toLocaleString('en-IN') : ''}
+                value={
+                  creditLimitRaw
+                    ? parseInt(creditLimitRaw, 10).toLocaleString("en-IN")
+                    : ""
+                }
                 onChange={handleLimitChange}
                 className="modal-input currency-input"
               />
               {formattedLimitPreview && (
-                <span className="limit-formatted-badge">₹{formattedLimitPreview}</span>
+                <span className="limit-formatted-badge">
+                  ₹{formattedLimitPreview}
+                </span>
               )}
             </div>
-            <span className="input-hint">Your approved credit line for this card.</span>
+            <span className="input-hint">
+              Your approved credit line for this card.
+            </span>
           </div>
 
           {/* Section 4: Statement Day & Payment Due Day */}
@@ -587,8 +638,9 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                 placeholder="e.g., 15"
                 value={statementDay}
                 onChange={(e) => {
-                  const val = e.target.value === '' ? '' : parseInt(e.target.value, 10)
-                  setStatementDay(val)
+                  const val =
+                    e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                  setStatementDay(val);
                 }}
                 className="modal-input"
               />
@@ -600,7 +652,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                 <label htmlFor="card-due-day" className="form-label">
                   Payment Due Day <span className="optional-tag">(1–31)</span>
                 </label>
-                {typeof statementDay === 'number' && statementDay >= 1 && (
+                {typeof statementDay === "number" && statementDay >= 1 && (
                   <button
                     type="button"
                     className="btn-auto-calc"
@@ -619,8 +671,9 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                 placeholder="e.g., 5"
                 value={paymentDueDay}
                 onChange={(e) => {
-                  const val = e.target.value === '' ? '' : parseInt(e.target.value, 10)
-                  setPaymentDueDay(val)
+                  const val =
+                    e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                  setPaymentDueDay(val);
                 }}
                 className="modal-input"
               />
@@ -629,7 +682,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
           </div>
 
           {/* Section 5: Optional Secure Physical Card Vault */}
-          <div className={`vault-toggle-container ${saveToVault ? 'active' : ''}`}>
+          {/* <div className={`vault-toggle-container ${saveToVault ? 'active' : ''}`}>
             <div className="vault-toggle-header" onClick={() => setSaveToVault(!saveToVault)}>
               <div className="vault-checkbox-wrap">
                 <input
@@ -770,7 +823,7 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Modal Actions */}
           <footer className="modal-footer">
@@ -790,17 +843,17 @@ export default function AddCardModal({ isOpen, onClose, onCardAdded }: AddCardMo
               {submitting ? (
                 <>
                   <span className="btn-spinner" />
-                  {saveToVault ? 'Encrypting & Linking…' : 'Linking Card…'}
+                  {saveToVault ? "Encrypting & Linking…" : "Linking Card…"}
                 </>
               ) : saveToVault ? (
-                'Save & Encrypt Card'
+                "Save & Encrypt Card"
               ) : (
-                'Add to Wallet'
+                "Add to Wallet"
               )}
             </button>
           </footer>
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -13,7 +13,7 @@ interface GmailStatus {
   scopes?: string
 }
 
-interface IngestResult {
+interface SyncResult {
   ok?: boolean
   processed?: number
   totalFound?: number
@@ -32,7 +32,7 @@ interface IngestResult {
 export const GmailForm = () => {
   const [status, setStatus] = useState<GmailStatus | null>(null)
   const [loading, setLoading] = useState(true)
-  const [ingesting, setIngesting] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false)
   const [error, setError] = useState(() => {
@@ -40,7 +40,7 @@ export const GmailForm = () => {
     const queryError = new URLSearchParams(window.location.search).get('error')
     return queryError ? decodeURIComponent(queryError) : ''
   })
-  const [ingestResult, setIngestResult] = useState<IngestResult | null>(null)
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
 
   const loadStatus = useCallback(async () => {
     try {
@@ -100,27 +100,41 @@ export const GmailForm = () => {
     }
   }
 
-  const handleIngest = async () => {
-    setIngesting(true)
+  const handleSyncStatements = async () => {
+    setSyncing(true)
     setError('')
-    setIngestResult(null)
+    setSyncResult(null)
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/gmail/ingest`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/gmail/sync-statements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ maxPdfs: 20 }),
       })
-      const data: IngestResult = await res.json()
-      setIngestResult(data)
+      const data = await res.json()
+      
       if (!res.ok) {
-        setError(data.error || 'Ingestion failed.')
+        setError(data.error || 'Failed to sync statements.')
+      } else {
+        setSyncResult({
+          ok: true,
+          processed: data.data.statement_count,
+          totalFound: data.data.message_count,
+          results: data.data.statements_metadata
+            ?.filter((meta: any) => meta.included)
+            .map((meta: any) => ({
+              issuer: meta.bank_slug || meta.sender_domain,
+              filename: meta.filename,
+              size: meta.size_bytes,
+              status: 'parsed',
+              error: null
+            }))
+        })
       }
       void loadStatus()
     } catch {
       setError('Network error. Please try again.')
     } finally {
-      setIngesting(false)
+      setSyncing(false)
     }
   }
 
@@ -245,10 +259,10 @@ export const GmailForm = () => {
               <button
                 type="button"
                 className="btn-sync"
-                onClick={handleIngest}
-                disabled={ingesting}
+                onClick={handleSyncStatements}
+                disabled={syncing}
               >
-                {ingesting ? (
+                {syncing ? (
                   <>
                     <span className="btn-spinner" />
                     Searching your Gmail…
@@ -279,19 +293,19 @@ export const GmailForm = () => {
               </span>
             </div>
 
-            {ingestResult && (
+            {syncResult && (
               <div className="ingest-results-card">
-                {ingestResult.error ? (
-                  <div className="results-error">{ingestResult.error}</div>
+                {syncResult.error ? (
+                  <div className="results-error">{syncResult.error}</div>
                 ) : (
                   <>
                     <div className="results-summary">
-                      {ingestResult.message ||
-                        `Processed ${ingestResult.processed || 0} statement(s).`}
+                      {syncResult.message ||
+                        `Processed ${syncResult.processed || 0} statement(s).`}
                     </div>
-                    {ingestResult.results && ingestResult.results.length > 0 && (
+                    {syncResult.results && syncResult.results.length > 0 && (
                       <ul className="results-list">
-                        {ingestResult.results.map((r, i) => (
+                        {syncResult.results.map((r, i) => (
                           <li key={i} className={`result-item ${r.status}`}>
                             <span className="result-status-tag">{r.status}</span>
                             <span className="result-filename">{r.filename}</span>

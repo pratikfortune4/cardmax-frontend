@@ -140,6 +140,29 @@ export default function WalletPage() {
   const [recLoading, setRecLoading] = useState(true);
   const [recSource, setRecSource] = useState<"live" | "static">("static");
 
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncStatements = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/gmail/sync-statements`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (res.ok) {
+        alert("Statements synced successfully!");
+        fetchCards();
+      } else {
+        alert(`Failed to sync statements: ${json.error || "Unknown error"}`);
+      }
+    } catch (e: any) {
+      alert(`Error syncing statements: ${e.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   // Horizontal scroll ref for recommendations
   const recScrollRef = useRef<HTMLDivElement>(null);
   const handleRecScroll = (direction: "left" | "right") => {
@@ -288,28 +311,54 @@ export default function WalletPage() {
               limits.
             </p>
           </div>
-          <button
-            type="button"
-            className="btn-add"
-            onClick={() => setIsAddModalOpen(true)}
-            id="btn-add-card"
-          >
-            <svg
-              width="15"
-              height="15"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={handleSyncStatements}
+              disabled={isSyncing}
+              style={{ backgroundColor: "transparent", color: "var(--text-primary)", border: "1px solid var(--border-color)" }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Add Card
-          </button>
+              {isSyncing ? (
+                <span className="btn-spinner dark" style={{ width: 14, height: 14, marginRight: 6 }} />
+              ) : (
+                <svg
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  style={{ marginRight: 6 }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+              {isSyncing ? "Syncing..." : "Sync Statements"}
+            </button>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={() => setIsAddModalOpen(true)}
+              id="btn-add-card"
+            >
+              <svg
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Card
+            </button>
+          </div>
         </header>
 
         {/* Overview Stats Bar */}
