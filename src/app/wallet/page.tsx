@@ -126,19 +126,19 @@ const STATIC_FALLBACK: RecommendationMathData[] = [
 ];
 
 interface SyncResult {
-  ok?: boolean
-  processed?: number
-  totalFound?: number
-  message?: string
-  error?: string
-  code?: string
+  ok?: boolean;
+  processed?: number;
+  totalFound?: number;
+  message?: string;
+  error?: string;
+  code?: string;
   results?: Array<{
-    issuer: string
-    filename: string
-    size: number
-    status: 'parsed' | 'error'
-    error?: string
-  }>
+    issuer: string;
+    filename: string;
+    size: number;
+    status: "parsed" | "error";
+    error?: string;
+  }>;
 }
 
 export default function WalletPage() {
@@ -163,10 +163,13 @@ export default function WalletPage() {
     setIsSyncing(true);
     setSyncResult(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/gmail/sync-statements`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/api/users/gmail/sync-statements`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
       const data = await res.json();
       if (res.ok) {
         setSyncResult({
@@ -179,13 +182,16 @@ export default function WalletPage() {
               issuer: meta.bank_slug || meta.sender_domain,
               filename: meta.filename,
               size: meta.size_bytes,
-              status: 'parsed',
-              error: null
-            }))
+              status: "parsed",
+              error: null,
+            })),
         });
         fetchCards();
       } else {
-        setSyncResult({ error: data.error?.message || data.error || "Failed to sync statements." });
+        setSyncResult({
+          error:
+            data.error?.message || data.error || "Failed to sync statements.",
+        });
       }
     } catch (e: any) {
       setSyncResult({ error: `Error syncing statements: ${e.message}` });
@@ -232,9 +238,12 @@ export default function WalletPage() {
     setIsFetchingPage(true);
     setRecLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/dashboard?page=${page}`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/api/users/dashboard?page=${page}`,
+        {
+          credentials: "include",
+        },
+      );
       if (res.ok) {
         const json = await res.json();
         if (json.dashboard?.recommendations) {
@@ -253,9 +262,9 @@ export default function WalletPage() {
           setCurrentPage(json.dashboard.recommendations.page);
           setTotalPages(json.dashboard.recommendations.totalPages);
           setRecSource("live");
-          
+
           if (recScrollRef.current) {
-            recScrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+            recScrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
           }
         }
       }
@@ -268,10 +277,11 @@ export default function WalletPage() {
     }
   };
 
-  const handlePageChange = (direction: 'prev' | 'next') => {
+  const handlePageChange = (direction: "prev" | "next") => {
     let newPage = currentPage;
-    if (direction === 'prev' && currentPage > 1) newPage = currentPage - 1;
-    if (direction === 'next' && currentPage < totalPages) newPage = currentPage + 1;
+    if (direction === "prev" && currentPage > 1) newPage = currentPage - 1;
+    if (direction === "next" && currentPage < totalPages)
+      newPage = currentPage + 1;
     if (newPage !== currentPage) fetchRecommendations(newPage);
   };
 
@@ -350,7 +360,10 @@ export default function WalletPage() {
               disabled={isSyncing}
             >
               {isSyncing ? (
-                <span className="btn-spinner" style={{ width: 14, height: 14, marginRight: 6 }} />
+                <span
+                  className="btn-spinner"
+                  style={{ width: 14, height: 14, marginRight: 6 }}
+                />
               ) : (
                 <svg
                   width="15"
@@ -361,7 +374,11 @@ export default function WalletPage() {
                   viewBox="0 0 24 24"
                   style={{ marginRight: 6 }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
               )}
               {isSyncing ? "Syncing..." : "Sync Statements"}
@@ -413,7 +430,7 @@ export default function WalletPage() {
 
         {/* Sync Results */}
         {syncResult && (
-          <div className="ingest-results-card" style={{ marginBottom: '1rem' }}>
+          <div className="ingest-results-card" style={{ marginBottom: "1rem" }}>
             {syncResult.error ? (
               <div className="results-error">{syncResult.error}</div>
             ) : (
@@ -429,7 +446,9 @@ export default function WalletPage() {
                         <span className="result-status-tag">{r.status}</span>
                         <span className="result-filename">{r.filename}</span>
                         <span className="result-issuer">({r.issuer})</span>
-                        {r.error && <span className="result-err"> — {r.error}</span>}
+                        {r.error && (
+                          <span className="result-err"> — {r.error}</span>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -692,7 +711,13 @@ export default function WalletPage() {
                     disabled={currentPage === 1 || isFetchingPage}
                     aria-label="Previous page"
                     title="Previous page"
-                    style={{ opacity: (currentPage === 1 || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === 1 || isFetchingPage) ? 'not-allowed' : 'pointer' }}
+                    style={{
+                      opacity: currentPage === 1 || isFetchingPage ? 0.5 : 1,
+                      cursor:
+                        currentPage === 1 || isFetchingPage
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
                   >
                     <svg
                       width="14"
@@ -707,8 +732,14 @@ export default function WalletPage() {
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                    {isFetchingPage ? '...' : `${currentPage} / ${totalPages}`}
+                  <span
+                    style={{
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {isFetchingPage ? "..." : `${currentPage} / ${totalPages}`}
                   </span>
                   <button
                     type="button"
@@ -717,7 +748,14 @@ export default function WalletPage() {
                     disabled={currentPage === totalPages || isFetchingPage}
                     aria-label="Next page"
                     title="Next page"
-                    style={{ opacity: (currentPage === totalPages || isFetchingPage) ? 0.5 : 1, cursor: (currentPage === totalPages || isFetchingPage) ? 'not-allowed' : 'pointer' }}
+                    style={{
+                      opacity:
+                        currentPage === totalPages || isFetchingPage ? 0.5 : 1,
+                      cursor:
+                        currentPage === totalPages || isFetchingPage
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
                   >
                     <svg
                       width="14"
@@ -777,7 +815,10 @@ export default function WalletPage() {
             <div className="wallet-rec-scroll-wrapper">
               <div className="wallet-rec-grid" ref={recScrollRef}>
                 {recTiles.map((rec, idx) => (
-                  <div key={`${rec.category}-${rec.bestCard}-${idx}`} className="wallet-rec-card">
+                  <div
+                    key={`${rec.category}-${rec.bestCard}-${idx}`}
+                    className="wallet-rec-card"
+                  >
                     <div className="wallet-rec-card__top">
                       <span className="wallet-rec-card__icon">{rec.icon}</span>
                       <span className="wallet-rec-card__category">
