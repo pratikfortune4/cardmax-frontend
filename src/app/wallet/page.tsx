@@ -11,6 +11,7 @@ import type { BestCardByCategoryItem } from "@/types";
 import { API_BASE_URL } from "@/lib/api";
 import "./styles.scss";
 import { ConfirmationModal } from "@/components/Confirmation/ConfirmationModal";
+import { SyncStatementsModal } from "./components/SyncStatementsModal";
 
 // Category icon + display name mapping
 const CATEGORY_META: Record<
@@ -157,9 +158,10 @@ export default function WalletPage() {
   const [recSource, setRecSource] = useState<"live" | "static">("static");
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
 
-  const handleSyncStatements = async () => {
+  const handleSyncStatements = async (periodMonths: number) => {
     setIsSyncing(true);
     setSyncResult(null);
     try {
@@ -167,6 +169,8 @@ export default function WalletPage() {
         `${API_BASE_URL}/api/users/gmail/sync-statements`,
         {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ period_months: periodMonths }),
           credentials: "include",
         },
       );
@@ -197,6 +201,7 @@ export default function WalletPage() {
       setSyncResult({ error: `Error syncing statements: ${e.message}` });
     } finally {
       setIsSyncing(false);
+      setIsSyncModalOpen(false);
     }
   };
 
@@ -356,7 +361,7 @@ export default function WalletPage() {
             <button
               type="button"
               className="btn-add"
-              onClick={handleSyncStatements}
+              onClick={() => setIsSyncModalOpen(true)}
               disabled={isSyncing}
             >
               {isSyncing ? (
@@ -903,6 +908,13 @@ export default function WalletPage() {
         cancelText="Cancel"
         variant="danger"
         isLoading={isDeletingCard}
+      />
+
+      <SyncStatementsModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+        onSync={handleSyncStatements}
+        isSyncing={isSyncing}
       />
     </div>
   );

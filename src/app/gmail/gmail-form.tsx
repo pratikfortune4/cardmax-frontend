@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { API_BASE_URL } from '@/lib/api'
 import { ConfirmationModal } from '@/components/Confirmation/ConfirmationModal'
+import { AnalysisPeriodSelector } from '@/components/AnalysisPeriodSelector/AnalysisPeriodSelector'
 import './gmail-consent.scss'
 
 interface GmailStatus {
@@ -11,6 +12,7 @@ interface GmailStatus {
   gmailAddress?: string
   connectedAt?: string
   scopes?: string
+  statementFetchMonths?: number
 }
 
 interface SyncResult {
@@ -33,6 +35,7 @@ export const GmailForm = () => {
   const [status, setStatus] = useState<GmailStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [analysisPeriod, setAnalysisPeriod] = useState<number>(6)
   const [disconnecting, setDisconnecting] = useState(false)
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false)
   const [error, setError] = useState(() => {
@@ -49,6 +52,9 @@ export const GmailForm = () => {
       })
       const data = await res.json()
       setStatus(data)
+      if (data.statementFetchMonths) {
+        setAnalysisPeriod(data.statementFetchMonths)
+      }
     } catch {
       setError('Could not load your Gmail connection status.')
     } finally {
@@ -63,7 +69,12 @@ export const GmailForm = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (active) setStatus(data)
+        if (active) {
+          setStatus(data)
+          if (data.statementFetchMonths) {
+            setAnalysisPeriod(data.statementFetchMonths)
+          }
+        }
       })
       .catch(() => {
         if (active) setError('Could not load your Gmail connection status.')
@@ -108,6 +119,7 @@ export const GmailForm = () => {
       const res = await fetch(`${API_BASE_URL}/api/users/gmail/sync-statements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ period_months: analysisPeriod }),
         credentials: 'include',
       })
       const data = await res.json()
@@ -256,6 +268,24 @@ export const GmailForm = () => {
             </div>
 
             <div className="action-box">
+              <AnalysisPeriodSelector 
+                value={analysisPeriod} 
+                onChange={async (val) => {
+                  setAnalysisPeriod(val);
+                  try {
+                    await fetch(`${API_BASE_URL}/api/users/gmail/settings`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ period_months: val }),
+                      credentials: 'include',
+                    });
+                  } catch (err) {
+                    console.error('Failed to save settings:', err);
+                  }
+                }}
+                disabled={syncing} 
+              />
+              
               <button
                 type="button"
                 className="btn-sync"
