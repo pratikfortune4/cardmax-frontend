@@ -125,6 +125,22 @@ const STATIC_FALLBACK: RecommendationMathData[] = [
   },
 ];
 
+interface SyncResult {
+  ok?: boolean
+  processed?: number
+  totalFound?: number
+  message?: string
+  error?: string
+  code?: string
+  results?: Array<{
+    issuer: string
+    filename: string
+    size: number
+    status: 'parsed' | 'error'
+    error?: string
+  }>
+}
+
 export default function WalletPage() {
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,23 +157,38 @@ export default function WalletPage() {
   const [recSource, setRecSource] = useState<"live" | "static">("static");
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
 
   const handleSyncStatements = async () => {
     setIsSyncing(true);
+    setSyncResult(null);
     try {
       const res = await fetch(`${API_BASE_URL}/api/users/gmail/sync-statements`, {
         method: "POST",
         credentials: "include",
       });
-      const json = await res.json();
+      const data = await res.json();
       if (res.ok) {
-        alert("Statements synced successfully!");
+        setSyncResult({
+          ok: true,
+          processed: data.data?.statement_count,
+          totalFound: data.data?.message_count,
+          results: data.data?.statements_metadata
+            ?.filter((meta: any) => meta.included)
+            .map((meta: any) => ({
+              issuer: meta.bank_slug || meta.sender_domain,
+              filename: meta.filename,
+              size: meta.size_bytes,
+              status: 'parsed',
+              error: null
+            }))
+        });
         fetchCards();
       } else {
-        alert(`Failed to sync statements: ${json.error || "Unknown error"}`);
+        setSyncResult({ error: data.error?.message || data.error || "Failed to sync statements." });
       }
     } catch (e: any) {
-      alert(`Error syncing statements: ${e.message}`);
+      setSyncResult({ error: `Error syncing statements: ${e.message}` });
     } finally {
       setIsSyncing(false);
     }
@@ -317,10 +348,9 @@ export default function WalletPage() {
               className="btn-add"
               onClick={handleSyncStatements}
               disabled={isSyncing}
-              style={{ backgroundColor: "transparent", color: "var(--text-primary)", border: "1px solid var(--border-color)" }}
             >
               {isSyncing ? (
-                <span className="btn-spinner dark" style={{ width: 14, height: 14, marginRight: 6 }} />
+                <span className="btn-spinner" style={{ width: 14, height: 14, marginRight: 6 }} />
               ) : (
                 <svg
                   width="15"
@@ -379,6 +409,34 @@ export default function WalletPage() {
               <span className="stat-val status-good">Optimized</span>
             </div>
           </section>
+        )}
+
+        {/* Sync Results */}
+        {syncResult && (
+          <div className="ingest-results-card" style={{ marginBottom: '1rem' }}>
+            {syncResult.error ? (
+              <div className="results-error">{syncResult.error}</div>
+            ) : (
+              <>
+                <div className="results-summary">
+                  {syncResult.message ||
+                    `Processed ${syncResult.processed || 0} statement(s).`}
+                </div>
+                {syncResult.results && syncResult.results.length > 0 && (
+                  <ul className="results-list">
+                    {syncResult.results.map((r, i) => (
+                      <li key={i} className={`result-item ${r.status}`}>
+                        <span className="result-status-tag">{r.status}</span>
+                        <span className="result-filename">{r.filename}</span>
+                        <span className="result-issuer">({r.issuer})</span>
+                        {r.error && <span className="result-err"> — {r.error}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+          </div>
         )}
 
         {/* Content Area */}

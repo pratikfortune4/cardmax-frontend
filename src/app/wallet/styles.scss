@@ -1682,3 +1682,73 @@ $font-sans: var(--font-inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Rob
     pointer-events: auto;
   }
 }
+.ingest-results-card {
+  background-color: #F7F7FC;
+  border: 1px solid rgba(84, 120, 240, 0.12);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.825rem;
+  margin-top: 1rem;
+
+  .results-summary {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      word-break: break-word;
+      line-height: 1.4;
+
+      .result-status-tag {
+        text-transform: uppercase;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.05rem 0.35rem;
+        border-radius: 4px;
+        background-color: #e2e8f0;
+        color: #334155;
+        white-space: nowrap;
+      }
+
+      &.parsed .result-status-tag {
+        background-color: #DCFCE7;
+        color: #15803D;
+      }
+
+      &.error .result-status-tag {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+      }
+
+      .result-filename {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .result-issuer {
+        color: #6B7280;
+      }
+
+      .result-err {
+        color: #B91C1C;
+        font-size: 0.75rem;
+        width: 100%;
+        margin-top: 0.15rem;
+      }
+    }
+  }
+}
