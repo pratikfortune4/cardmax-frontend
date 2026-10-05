@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { API_BASE_URL } from "@/lib/api";
+import { useNotificationProvider } from "@/hooks/useNotificationProvider";
 import "./NotificationBell.scss";
 
 interface NotificationItem {
@@ -50,28 +51,26 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const [loading, setLoading] = useState(false);
   const [hasNewNotif, setHasNewNotif] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const prevCountRef = useRef(0);
+  const provider = useNotificationProvider();
 
-  const fetchUnreadCount = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE_URL}/api/notifications/unread-count`,
-        { credentials: "include" },
-      );
-      if (!res.ok) return;
-      const data = await res.json();
-      const count = data.count ?? 0;
-      if (count > prevCountRef.current) {
+  // Initialize notification provider
+  useEffect(() => {
+    provider.start({
+      onUnreadCountChange: (count) => {
+        setUnreadCount(count);
+      },
+      onNewNotification: () => {
         setHasNewNotif(true);
         setTimeout(() => setHasNewNotif(false), 30000);
-      }
-      prevCountRef.current = count;
-      setUnreadCount(count);
-    } catch {
-      // Silently fail — non-critical
-    }
-  }, []);
+      },
+    });
+    
+    return () => {
+      provider.stop();
+    };
+  }, [provider]);
 
+  // Fetch notifications when dropdown opens
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
@@ -88,14 +87,6 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     }
   }, []);
 
-  // Poll unread count every 30s
-  useEffect(() => {
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30_000);
-    return () => clearInterval(interval);
-  }, [fetchUnreadCount]);
-
-  // Fetch notifications when dropdown opens
   useEffect(() => {
     if (isOpen) {
       fetchNotifications();
