@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { AnalysisPeriodSelector } from "@/components/AnalysisPeriodSelector/AnalysisPeriodSelector";
+import { GmailScanner } from "@/components/GmailScanner";
 import "./SyncStatementsModal.scss";
 import { API_BASE_URL } from "@/lib/api";
 
@@ -88,38 +89,40 @@ export const SyncStatementsModal: React.FC<SyncStatementsModalProps> = ({
           <p>Import your credit card statements securely from Gmail.</p>
         </div>
 
-        <div className="sync-modal-body">
-          <AnalysisPeriodSelector
-            value={period}
-            onChange={handlePeriodChange}
-            disabled={isSyncing}
-          />
-        </div>
+        {isSyncing ? (
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+            <GmailScanner />
+          </div>
+        ) : (
+          <>
+            <div className="sync-modal-body">
+              <AnalysisPeriodSelector
+                value={period}
+                onChange={handlePeriodChange}
+                disabled={isSyncing}
+              />
+            </div>
 
-        <div className="sync-modal-actions">
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={onClose}
-            disabled={isSyncing}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="btn-sync"
-            onClick={() => onSync(period)}
-            disabled={isSyncing}
-          >
-            {isSyncing ? (
-              <>
-                <span className="btn-spinner" /> Syncing...
-              </>
-            ) : (
-              "Proceed / Sync"
-            )}
-          </button>
-        </div>
+            <div className="sync-modal-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={onClose}
+                disabled={isSyncing}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-sync"
+                onClick={() => onSync(period)}
+                disabled={isSyncing}
+              >
+                Proceed / Sync
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

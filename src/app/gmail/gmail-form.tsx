@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { API_BASE_URL } from '@/lib/api'
 import { ConfirmationModal } from '@/components/Confirmation/ConfirmationModal'
 import { AnalysisPeriodSelector } from '@/components/AnalysisPeriodSelector/AnalysisPeriodSelector'
+import { GmailScanner } from '@/components/GmailScanner'
 import './gmail-consent.scss'
 
 interface GmailStatus {
@@ -267,61 +268,58 @@ export const GmailForm = () => {
               </div>
             </div>
 
-            <div className="action-box">
-              <AnalysisPeriodSelector 
-                value={analysisPeriod} 
-                onChange={async (val) => {
-                  setAnalysisPeriod(val);
-                  try {
-                    await fetch(`${API_BASE_URL}/api/users/gmail/settings`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ period_months: val }),
-                      credentials: 'include',
-                    });
-                  } catch (err) {
-                    console.error('Failed to save settings:', err);
-                  }
-                }}
-                disabled={syncing} 
-              />
-              
-              <button
-                type="button"
-                className="btn-sync"
-                onClick={handleSyncStatements}
-                disabled={syncing}
-              >
-                {syncing ? (
-                  <>
-                    <span className="btn-spinner" />
-                    Searching your Gmail…
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      width="15"
-                      height="15"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                    Import Statements Now
-                  </>
-                )}
-              </button>
-              <span className="helper-text">
-                CardMax performs a read-only scan for statement PDFs from supported Indian credit
-                card issuers.
-              </span>
-            </div>
+            {syncing ? (
+              <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+                <GmailScanner />
+              </div>
+            ) : (
+              <div className="action-box">
+                <AnalysisPeriodSelector 
+                  value={analysisPeriod} 
+                  onChange={async (val) => {
+                    setAnalysisPeriod(val);
+                    try {
+                      await fetch(`${API_BASE_URL}/api/users/gmail/settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ period_months: val }),
+                        credentials: 'include',
+                      });
+                    } catch (err) {
+                      console.error('Failed to save settings:', err);
+                    }
+                  }}
+                  disabled={syncing} 
+                />
+                
+                <button
+                  type="button"
+                  className="btn-sync"
+                  onClick={handleSyncStatements}
+                  disabled={syncing}
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Import Statements Now
+                </button>
+                <span className="helper-text">
+                  CardMax performs a read-only scan for statement PDFs from supported Indian credit
+                  card issuers.
+                </span>
+              </div>
+            )}
 
             {syncResult && (
               <div className="ingest-results-card">
