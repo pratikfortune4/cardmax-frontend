@@ -219,83 +219,56 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
               )}
             </div>
           </div>
-        </section>
-
-        {/* Quick Actions Bar */}
-        <section aria-label="Quick Actions">
-          <div className="cm-section-title">
-            <h2>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
-              Quick Actions
-            </h2>
-          </div>
-
-          <div className="cm-quick-actions-bar">
-            <Link href="/wallet" className="cm-quick-action-btn">
-              <div className="cm-action-icon">
+          {/* Card 4: Total Spent This Month */}
+          <div className="cm-metric-card cm-metric-card--purple">
+            <div className="cm-metric-card__header">
+              <span>Total Spent This Month</span>
+              <div className="cm-metric-icon cm-metric-icon--purple">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 4v16m8-8H4" />
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                 </svg>
               </div>
-              <div className="cm-action-text">
-                <span>Add New Card</span>
-                <span>Link card to wallet</span>
-              </div>
-            </Link>
-
-            <Link href="/wallet" className="cm-quick-action-btn">
-              <div className="cm-action-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="14" x="2" y="5" rx="3" />
-                  <line x1="2" x2="22" y1="10" y2="10" />
-                </svg>
-              </div>
-              <div className="cm-action-text">
-                <span>Manage Wallet</span>
-                <span>View {metrics.activeCardsCount} active cards</span>
-              </div>
-            </Link>
-
-            <Link href="/gmail" className="cm-quick-action-btn">
-              <div className="cm-action-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h9" />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </div>
-              <div className="cm-action-text">
-                <span>Gmail Statements</span>
-                <span>{gmailConnected ? 'Connected & synced' : 'Connect auto-sync'}</span>
-              </div>
-            </Link>
-
-            <Link href="/settings/consent" className="cm-quick-action-btn">
-              <div className="cm-action-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                </svg>
-              </div>
-              <div className="cm-action-text">
-                <span>Consent Settings</span>
-                <span>Privacy &amp; permissions</span>
-              </div>
-            </Link>
+            </div>
+            <div className="cm-metric-value">₹0</div>
+            <div className="cm-metric-subtext">
+              <span className="cm-badge-status cm-badge-status--good">↑ 0%</span>
+              <span>&bull; vs last month</span>
+            </div>
           </div>
         </section>
 
-        {/* Analytics Section */}
-        {!data.analytics && (
-          <div style={{ padding: '1rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', margin: '2rem 0' }}>
-            <strong>Debug:</strong> No analytics data received from backend API. Please restart the Payload server.
-          </div>
-        )}
-        {data.analytics && <AnalyticsSection analytics={data.analytics} />}
+        {/* Quick Actions Bar - Slim Row */}
+        <section aria-label="Quick Actions" className="cm-quick-actions-slim">
+          <Link href="/wallet" className="cm-quick-action-chip" title="Link card to wallet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 4v16m8-8H4" />
+            </svg>
+            Add New Card
+          </Link>
+          <Link href="/wallet" className="cm-quick-action-chip" title={`View ${metrics.activeCardsCount} active cards`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="20" height="14" x="2" y="5" rx="3" />
+              <line x1="2" x2="22" y1="10" y2="10" />
+            </svg>
+            Manage Wallet
+          </Link>
+          <Link href="/gmail" className="cm-quick-action-chip" title={gmailConnected ? 'Connected & synced' : 'Connect auto-sync'}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h9" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            Gmail Statements
+          </Link>
+          <Link href="/settings/consent" className="cm-quick-action-chip" title="Privacy & permissions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+            </svg>
+            Consent Settings
+          </Link>
+        </section>
 
-        {/* Body Grid: Recommendations + Max Pro Banner */}
+        {/* Body Grid: Recommendations Carousel */}
         <section className="cm-dashboard-body-grid">
-          {/* Recommendations Widget */}
           <div className="cm-recommendations-widget">
             <div className="cm-widget-header">
               <div className="cm-widget-title">
@@ -306,10 +279,8 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
                   </svg>
                   Best Card to Use This Month
                 </h3>
-                <p>Maximize your reward multipliers and cashback across everyday spending categories</p>
               </div>
               <div className="cm-widget-controls">
-                <span className="cm-month-pill">Active Boosts</span>
                 <div className="cm-scroll-arrows">
                   <button
                     type="button"
@@ -324,9 +295,6 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                    {isFetchingPage ? '...' : `${currentPage} / ${totalPages}`}
-                  </span>
                   <button
                     type="button"
                     className="cm-scroll-btn"
@@ -346,74 +314,79 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
 
             <div className="cm-categories-scroll-wrapper">
               <div className="cm-categories-grid" ref={scrollContainerRef}>
-                {paginatedRecommendations.map((rec, index) => (
-                  <div key={`${rec.category}-${index}`} className="cm-category-card">
-                    <div className="cm-cat-top">
-                      <span className="cm-cat-title">
-                        <span className="cm-cat-emoji">{getCategoryIcon(rec.icon)}</span>
-                        <span>{rec.category}</span>
-                      </span>
-                      <span className="cm-cat-multiplier">{rec.multiplier}</span>
+                {paginatedRecommendations.map((rec, index) => {
+                  const isTopPick = index === 0 && currentPage === 1;
+                  const formatCategory = (str: string) => str.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                  const categoryName = formatCategory(rec.category);
+                  const isPremium = categoryName.toLowerCase().includes('premium');
+                  const isMid = categoryName.toLowerCase().includes('mid');
+
+                  return (
+                    <div key={`${rec.category}-${index}`} className="cm-category-card">
+                      {isTopPick && <div className="cm-top-pick-ribbon">Top Pick</div>}
+                      <div className="cm-cat-top">
+                        <span className="cm-cat-title">
+                          <span className="cm-cat-emoji">{getCategoryIcon(rec.icon)}</span>
+                          <span>{categoryName}</span>
+                          {isPremium && <span className="cm-tier-badge cm-tier-badge--premium">Premium</span>}
+                          {isMid && <span className="cm-tier-badge cm-tier-badge--mid">Mid</span>}
+                        </span>
+                      </div>
+
+                      <div className="cm-cat-card-name">{rec.bestCard}</div>
+                      <div className="cm-cat-multiplier-badge">{rec.multiplier}</div>
+
+                      <div className="cm-cat-status">
+                        {rec.isOwned ? (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>In Your Wallet</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <span>Recommended</span>
+                          </>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        className="cm-show-maths-btn"
+                        id={`show-maths-${rec.category.replace(/\s+/g, '-').replace(/&/g, 'and').toLowerCase()}`}
+                        onClick={() =>
+                          setActiveMathRec({
+                            category: rec.category,
+                            categorySlug: rec.categorySlug,
+                            cardName: rec.cardName || rec.bestCard,
+                            icon: getCategoryIcon(rec.icon),
+                            bestCard: rec.bestCard,
+                            multiplier: rec.multiplier,
+                          })
+                        }
+                        aria-label={`Show the maths behind ${rec.category} recommendation`}
+                      >
+                        Show Me the Maths →
+                      </button>
                     </div>
-
-                    <div className="cm-cat-card-name">{rec.bestCard}</div>
-                    <div className="cm-cat-perk">{rec.perkSummary}</div>
-
-                    <div className={`cm-cat-status ${rec.isOwned ? 'cm-cat-status--owned' : ''}`}>
-                      {rec.isOwned ? (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                          <span>In Your Wallet</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" />
-                            <line x1="12" y1="16" x2="12.01" />
-                          </svg>
-                          <span>Recommended Pick</span>
-                        </>
-                      )}
-                    </div>
-
-                    {/* ── Show Me the Maths Trigger ── */}
-                    <button
-                      type="button"
-                      className="cm-show-maths-btn"
-                      id={`show-maths-${rec.category.replace(/\s+/g, '-').replace(/&/g, 'and').toLowerCase()}`}
-                      onClick={() =>
-                        setActiveMathRec({
-                          category: rec.category,
-                          categorySlug: rec.categorySlug,
-                          cardName: rec.cardName || rec.bestCard,
-                          icon: getCategoryIcon(rec.icon),
-                          bestCard: rec.bestCard,
-                          multiplier: rec.multiplier,
-                        })
-                      }
-                      aria-label={`Show the maths behind ${rec.category} recommendation`}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="2" width="16" height="20" rx="2" />
-                        <line x1="8" y1="6" x2="16" y2="6" />
-                        <line x1="8" y1="10" x2="10" y2="10" />
-                        <line x1="14" y1="10" x2="16" y2="10" />
-                        <line x1="8" y1="14" x2="10" y2="14" />
-                        <line x1="14" y1="14" x2="16" y2="14" />
-                        <line x1="8" y1="18" x2="10" y2="18" />
-                        <line x1="14" y1="18" x2="16" y2="18" />
-                      </svg>
-                      Show Me the Maths →
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
         </section>
+
+        {/* Analytics Section */}
+        {!data.analytics && (
+          <div style={{ padding: '1rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', margin: '2rem 0' }}>
+            <strong>Debug:</strong> No analytics data received from backend API. Please restart the Payload server.
+          </div>
+        )}
+        {data.analytics && <AnalyticsSection analytics={data.analytics} />}
       </div>
 
       {/* ── Show Me the Maths Modal ───────────────────────────────────── */}
