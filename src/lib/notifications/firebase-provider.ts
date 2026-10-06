@@ -42,8 +42,6 @@ export class FirebaseNotificationProvider implements NotificationProvider {
         throw new Error("No registration token available");
       }
 
-      console.log("✅ YOUR FCM TOKEN IS:", token);
-
       await this.registerTokenWithBackend(token);
       this.listenForMessages(messaging);
 
@@ -113,7 +111,6 @@ export class FirebaseNotificationProvider implements NotificationProvider {
 
   private listenForMessages(messaging: any): void {
     this.unsubscribeFromMessages = onMessage(messaging, (payload) => {
-      console.log("📬 [Foreground] Notification received:", payload);
       if (this.callbacks) {
         if (this.callbacks.onNewNotification) {
           this.callbacks.onNewNotification(payload);
