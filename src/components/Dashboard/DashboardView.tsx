@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import ShowMeTheMathsModal, { type RecommendationMathData } from './ShowMeTheMathsModal'
+import { AnalyticsSection } from './AnalyticsSection'
 import '@/app/home.scss'
 
 import { API_BASE_URL } from '@/lib/api'
@@ -42,6 +43,14 @@ export interface DashboardData {
     hasPrevPage: boolean
   }
   recentStatementsCount: number
+  analytics?: {
+    creditLimits: Array<{ name: string; value: number }>
+    rewardMultipliers: Array<{ cardName: string; value: number; type: 'cashback' | 'points' }>
+    spendAnalysis: {
+      available: boolean
+      data: Array<{ month: string; spend: number }>
+    }
+  }
 }
 
 const getCategoryIcon = (icon?: string): string => {
@@ -275,6 +284,14 @@ export const DashboardView: React.FC<{ data: DashboardData }> = ({ data }) => {
             </Link>
           </div>
         </section>
+
+        {/* Analytics Section */}
+        {!data.analytics && (
+          <div style={{ padding: '1rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', margin: '2rem 0' }}>
+            <strong>Debug:</strong> No analytics data received from backend API. Please restart the Payload server.
+          </div>
+        )}
+        {data.analytics && <AnalyticsSection analytics={data.analytics} />}
 
         {/* Body Grid: Recommendations + Max Pro Banner */}
         <section className="cm-dashboard-body-grid">

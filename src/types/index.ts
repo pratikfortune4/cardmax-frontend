@@ -48,17 +48,31 @@ export interface DashboardData {
       hasUpcomingDue: boolean
     }
   }
+  analytics: {
+    creditLimits: Array<{ name: string; value: number }>
+    rewardMultipliers: Array<{ cardName: string; value: number; type: 'cashback' | 'points' }>
+    spendAnalysis: {
+      available: boolean
+      data: Array<{ month: string; spend: number }>
+    }
+  }
   gmailConnected: boolean
-  recommendations: Array<{
-    category: string
-    categorySlug?: string
-    cardName?: string
-    icon: string
-    bestCard: string
-    multiplier: string
-    perkSummary: string
-    isOwned: boolean
-  }>
+  recommendations: {
+    docs: Array<{
+      category: string
+      categorySlug?: string
+      cardName?: string
+      icon: string
+      bestCard: string
+      multiplier: string
+      perkSummary: string
+      isOwned: boolean
+    }>
+    page: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }
   recentStatementsCount: number
 }
 

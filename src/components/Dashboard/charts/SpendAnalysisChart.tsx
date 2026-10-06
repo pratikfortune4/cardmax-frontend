@@ -1,0 +1,57 @@
+'use client'
+
+import React from 'react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+
+interface SpendAnalysisChartProps {
+  available: boolean
+  data: Array<{ month: string; spend: number }>
+}
+
+export const SpendAnalysisChart: React.FC<SpendAnalysisChartProps> = ({ available, data }) => {
+  if (!available || !data || data.length === 0) {
+    return (
+      <div className="cm-chart-empty" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#64748b' }}>
+        <p>No spending data available yet.</p>
+      </div>
+    )
+  }
+
+  const formatYAxis = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      notation: 'compact',
+      compactDisplay: 'short'
+    }).format(value)
+  }
+
+  const formatTooltip = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(value)
+  }
+
+  return (
+    <div style={{ width: '100%', height: 300 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <defs>
+            <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+          <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={formatYAxis} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+          <Tooltip formatter={formatTooltip} />
+          <Area type="monotone" dataKey="spend" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorSpend)" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
