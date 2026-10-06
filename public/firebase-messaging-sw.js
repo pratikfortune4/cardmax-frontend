@@ -16,16 +16,9 @@ if (firebaseConfig.apiKey) {
   const messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    const { title, body } = payload.notification || {};
-    const notificationOptions = {
-      body: body || 'You have a new notification',
-      icon: '/favicon.svg',
-      badge: '/favicon.svg',
-      data: payload.data,
-      tag: payload.data?.notificationGroupId || 'cardmax-notification',
-    };
-
-    self.registration.showNotification(title || 'CardMax', notificationOptions);
+    console.log('👻 [Background Service Worker] Notification received!', payload);
+    // Firebase automatically displays a notification if the payload contains a "notification" object.
+    // We only need this listener if we want to run custom background logic or handle data-only payloads!
   });
 }
 
