@@ -13,6 +13,7 @@ import {
 import { GmailScanner } from "@/components/GmailScanner";
 import {
   syncStatements,
+  optimizeUploadedStatements,
   StatementSyncProfile,
   StatementSyncPayload,
 } from "@/services/statementSyncService";
@@ -598,7 +599,33 @@ export function StatementSyncClient() {
                 <button
                   className={styles.actionButton}
                   disabled={uploadedFiles.length === 0}
-                  onClick={() => console.log("Analyse uploaded files")}
+                  onClick={async () => {
+                    setLoading(true);
+                    setError(null);
+                    setResults(null);
+                    setSelectedIds(new Set());
+                    
+                    try {
+                      const res = await optimizeUploadedStatements(uploadedFiles, profile);
+                      if (res.success && res.data) {
+                        setResults(res.data);
+                        const allIds = new Set<string>();
+                        // Backend data format for optimize API might differ from gmail API,
+                        // handle it defensively or just route directly to dashboard
+                        if (res.data.statements_metadata) {
+                          res.data.statements_metadata.forEach((r: any) => allIds.add(r.id));
+                        }
+                        setSelectedIds(allIds);
+                        setTimeout(() => {
+                          resultsRef.current?.scrollIntoView({ behavior: "smooth" });
+                        }, 100);
+                      }
+                    } catch (err: any) {
+                      setError(err.message || "Upload failed");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
                 >
                   Analyse {uploadedFiles.length} Statements →
                 </button>
@@ -639,16 +666,16 @@ export function StatementSyncClient() {
         {results && (
           <div className={styles.resultsSection} ref={resultsRef}>
             <div className={styles.resultsHeader}>
-              {results.statement_count} STATEMENT
-              {results.statement_count !== 1 ? "S" : ""} FOUND · {periodMonths}{" "}
+              {results.statement_count || (results.statements_metadata || []).length || 0} STATEMENT
+              {(results.statement_count || (results.statements_metadata || []).length) !== 1 ? "S" : ""} FOUND · {periodMonths}{" "}
               MONTH{periodMonths !== 1 ? "S" : ""} ·{" "}
-              {results.statements_metadata.length} CARD
-              {results.statements_metadata.length !== 1 ? "S" : ""}
+              {(results.statements_metadata || []).length} CARD
+              {(results.statements_metadata || []).length !== 1 ? "S" : ""}
             </div>
 
             <div style={{ marginBottom: "16px" }}>
-              {results.statements_metadata.map((r: any) => (
-                <div key={r.id} className={styles.resultRow}>
+              {(results.statements_metadata || []).map((r: any, idx: number) => (
+                <div key={r.id || idx} className={styles.resultRow}>
                   <div className={styles.resultRowLeft}>
                     <input
                       type="checkbox"
@@ -661,13 +688,13 @@ export function StatementSyncClient() {
                       }}
                     />
                     <span className={styles.resultLabel}>
-                      {r.bank_slug} · {r.filename.replace(".pdf", "")}
+                      {r.bank_slug || "Unknown"} · {(r.filename || r.name || `Statement ${idx + 1}`).replace(".pdf", "")}
                     </span>
                   </div>
                   <span
                     className={`${styles.resultStatus} ${r.status === "UNLOCKED" ? styles.unlocked : styles.locked}`}
                   >
-                    {r.status}
+                    {r.status || "UNLOCKED"}
                   </span>
                 </div>
               ))}

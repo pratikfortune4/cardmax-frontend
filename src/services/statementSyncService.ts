@@ -62,6 +62,36 @@ export const syncStatements = async (payload: StatementSyncPayload) => {
   }
 }
 
+export const optimizeUploadedStatements = async (files: File[], profile: StatementSyncProfile) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+  
+  // Optionally append profile fields here if backend uses them
+  formData.append("annual_income", profile.monthlySpend || "");
+  formData.append("employment_type", profile.employmentType || "");
+  formData.append("portfolio_size", profile.portfolioSize || "");
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/optimize/statement`, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    const json = await res.json();
+    if (res.ok) {
+      return { success: true, data: json.data || json };
+    }
+    
+    throw new Error(json.error?.message || json.error || "Optimization failed");
+  } catch (error: any) {
+    console.error("Error in optimizeUploadedStatements:", error);
+    throw new Error(error.message || "Network error occurred");
+  }
+}
+
 // ----------------------------------------------------
 // MANUAL SPEND JOURNEY
 // ----------------------------------------------------
