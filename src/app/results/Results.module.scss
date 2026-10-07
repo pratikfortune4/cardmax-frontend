@@ -243,3 +243,256 @@
     }
   }
 }
+
+/* --- New Generic Renderer Styles --- */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-4;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.notices {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+}
+
+.notice {
+  padding: $spacing-4;
+  border-radius: $radius-md;
+  border-left: 4px solid transparent;
+  display: flex;
+  gap: $spacing-3;
+  align-items: flex-start;
+  box-shadow: $shadow-sm;
+  background: $color-surface-white;
+}
+
+.noticeInfo {
+  border-left-color: $color-primary;
+  background: rgba(79, 70, 229, 0.05);
+}
+
+.noticeWarn {
+  border-left-color: $color-warning;
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  background: $color-bg-light;
+  color: $color-text-secondary;
+  border: 1px solid $color-border-subtle;
+}
+
+.kvGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spacing-4;
+}
+
+.kvItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.kvLabel {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: $font-weight-semibold;
+}
+
+.kvValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  word-break: break-word;
+}
+
+.collapsible {
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-md;
+  overflow: hidden;
+  margin-bottom: $spacing-3;
+
+  summary {
+    padding: $spacing-3 $spacing-4;
+    background: $color-bg-light;
+    cursor: pointer;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    user-select: none;
+    
+    &:hover {
+      background: $color-border-subtle;
+    }
+  }
+
+  > div {
+    padding: $spacing-4;
+    border-top: 1px solid $color-border-subtle;
+    background: $color-surface-white;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.chip {
+  padding: $spacing-1 $spacing-3;
+  background: $color-bg-light;
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-md;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: $font-size-sm;
+
+  th, td {
+    padding: $spacing-3;
+    border-bottom: 1px solid $color-border-subtle;
+    white-space: nowrap;
+  }
+
+  th {
+    background: $color-bg-light;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    position: sticky;
+    top: 0;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: $color-primary;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: underline;
+
+  &:hover {
+    color: $color-primary-hover;
+  }
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.cardRow {
+  padding: $spacing-4;
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-md;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: $color-surface-white;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $color-primary-subtle;
+    box-shadow: $shadow-sm;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4;
+}
+
+.modal {
+  background: $color-surface-white;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: $radius-lg;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid $color-border;
+  background: $color-bg-light;
+
+  button {
+    flex: 1;
+    padding: $spacing-3;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-border-subtle;
+    }
+  }
+}
+
+.tabActive {
+  border-bottom-color: $color-primary !important;
+  color: $color-primary !important;
+  font-weight: $font-weight-bold !important;
+}
+
+.applyBtn {
+  display: block;
+  text-align: center;
+  padding: $spacing-3;
+  background: $color-primary;
+  color: $color-surface-white;
+  text-decoration: none;
+  border-radius: $radius-md;
+  font-weight: $font-weight-bold;
+  margin-top: $spacing-4;
+
+  &:hover {
+    background: $color-primary-hover;
+  }
+}
