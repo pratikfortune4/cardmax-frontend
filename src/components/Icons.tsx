@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon as IconifyIcon, IconProps } from '@iconify/react';
+export const IconUpload = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:upload" {...props} />;
 
 export const IconArrowLeft = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:arrow-left" {...props} />;
 export const IconMonitor = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:monitor" {...props} />;

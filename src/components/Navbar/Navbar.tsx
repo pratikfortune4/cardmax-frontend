@@ -11,6 +11,7 @@ import {
   IconX,
   IconChevronDown,
   IconCreditCard,
+  IconCompass,
 } from "@/components/Icons";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -237,6 +238,15 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
                   </Link>
 
                   <Link
+                    href="/card-test"
+                    className="cm-dropdown-item"
+                    role="menuitem"
+                  >
+                    <IconCompass />
+                    Right Card Test
+                  </Link>
+
+                  <Link
                     href="/profile"
                     className="cm-dropdown-item"
                     role="menuitem"
@@ -327,6 +337,17 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
               <span className="cm-mobile-nav-link__title">
                 <IconWallet />
                 Wallet
+              </span>
+            </Link>
+
+            <Link
+              href="/card-test"
+              className={`cm-mobile-nav-link ${pathname === "/card-test" ? "is-active" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span className="cm-mobile-nav-link__title">
+                <IconCompass />
+                Card Test
               </span>
             </Link>
 

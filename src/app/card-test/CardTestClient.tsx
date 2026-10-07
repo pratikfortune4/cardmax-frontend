@@ -3,7 +3,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
-import { IconLock, IconChevronRight, IconMail, IconFileText, IconMonitor, IconArrowLeft } from '@/components/Icons';
+import {
+  IconLock,
+  IconGoogle,
+  IconUpload,
+  IconMonitor,
+  IconArrowLeft,
+} from "@/components/Icons";
 
 type TestMethod = "expenses" | "statements" | "gmail";
 
@@ -35,11 +41,8 @@ export function CardTestClient() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.header}>
-        <button
-          className={styles.backButton}
-          onClick={() => router.back()}
-        >
-          <IconArrowLeft width="24" height="24" />
+        <button className={styles.backButton} onClick={() => router.back()}>
+          <IconArrowLeft width="20" height="20" />
         </button>
       </div>
 
@@ -49,22 +52,6 @@ export function CardTestClient() {
           Find out which credit cards fit your spending habits and discover how
           to get more value from your cards.
         </p>
-
-        <div className={styles.heroVisual} aria-hidden="true">
-          <div
-            className={`${styles.decorativeCircle} ${styles.topRight}`}
-          ></div>
-          <div
-            className={`${styles.decorativeCircle} ${styles.bottomLeft}`}
-          ></div>
-          <div className={styles.cardMockup}>
-            <div className={styles.cardChip}></div>
-            <div className={styles.cardLines}>
-              <div className={`${styles.cardLine} ${styles.long}`}></div>
-              <div className={`${styles.cardLine} ${styles.short}`}></div>
-            </div>
-          </div>
-        </div>
 
         <h2 className={styles.optionsTitle}>
           How would you like to get started?
@@ -77,16 +64,13 @@ export function CardTestClient() {
             onClick={() => handleMethodSelect("expenses")}
           >
             <div className={styles.optionIcon}>
-              <IconMonitor width="24" height="24" />
+              <IconMonitor width="20" height="20" />
             </div>
             <div className={styles.optionContent}>
               <span className={styles.optionTitle}>Enter Expenses</span>
               <span className={styles.optionSubtitle}>
                 Based on your spending habits
               </span>
-            </div>
-            <div className={styles.optionArrow}>
-              <IconChevronRight width="20" height="20" />
             </div>
           </button>
 
@@ -96,14 +80,11 @@ export function CardTestClient() {
             onClick={() => handleMethodSelect("statements")}
           >
             <div className={styles.optionIcon}>
-              <IconFileText width="24" height="24" />
+              <IconUpload width="20" height="20" />
             </div>
             <div className={styles.optionContent}>
               <span className={styles.optionTitle}>Upload Statements</span>
               <span className={styles.optionSubtitle}>PDF from your bank</span>
-            </div>
-            <div className={styles.optionArrow}>
-              <IconChevronRight width="20" height="20" />
             </div>
           </button>
 
@@ -113,14 +94,13 @@ export function CardTestClient() {
             onClick={() => handleMethodSelect("gmail")}
           >
             <div className={styles.optionIcon}>
-              <IconMail width="24" height="24" />
+              <IconGoogle width="20" height="20" />
             </div>
             <div className={styles.optionContent}>
               <span className={styles.optionTitle}>Scan Gmail</span>
-              <span className={styles.optionSubtitle}>Securely & privately</span>
-            </div>
-            <div className={styles.optionArrow}>
-              <IconChevronRight width="20" height="20" />
+              <span className={styles.optionSubtitle}>
+                Securely & privately
+              </span>
             </div>
           </button>
         </div>
@@ -135,7 +115,7 @@ export function CardTestClient() {
           </button>
 
           <div className={styles.securityText}>
-            <IconLock className={styles.securityIcon} width="24" height="24" />
+            <IconLock className={styles.securityIcon} width="14" height="14" />
             Your information is safe and secure
           </div>
         </div>
