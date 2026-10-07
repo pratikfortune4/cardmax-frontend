@@ -49,3 +49,4 @@ export const IconWallet = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon=
 export const IconUser = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:user" {...props} />;
 export const IconMenu = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:menu" {...props} />;
 export const IconBell = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:bell" {...props} />;
+export const IconSliders = (props: Omit<IconProps, 'icon'>) => <IconifyIcon icon="lucide:sliders" {...props} />;

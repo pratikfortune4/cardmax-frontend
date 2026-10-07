@@ -102,18 +102,43 @@
   }
 }
 
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-4;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    gap: $spacing-4;
+
+    .formGroup {
+      margin-bottom: 0;
+      flex: 1;
+    }
+  }
+}
+
 .formLabel {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
-  margin-bottom: $spacing-2;
+  margin-bottom: $spacing-1;
 }
 
 .formHelper {
   font-size: $font-size-xs;
-  color: $color-text-muted;
-  margin-top: $spacing-1;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-2;
+  line-height: $line-height-normal;
+  
+  &.highlight {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
 }
 
 .formInput {
@@ -121,16 +146,31 @@
   padding: $spacing-2 $spacing-3;
   border: 1px solid $color-border;
   border-radius: $radius-md;
+  font-family: $font-sans;
   font-size: $font-size-sm;
   color: $color-text-primary;
-  background: $color-bg-main;
+  background: $color-surface-white;
   transition: all 0.2s;
+  height: 40px;
+
+  &::placeholder {
+    color: $color-text-muted;
+  }
 
   &:focus {
     outline: none;
     border-color: $color-primary;
     box-shadow: 0 0 0 3px $color-primary-subtle;
   }
+}
+
+.inputPrefix {
+  position: absolute;
+  left: $spacing-3;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
 }
 
 .formSelect {
@@ -520,5 +560,74 @@
     strong {
       color: $color-text-primary;
     }
+  }
+}
+
+.loadingSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-8 0;
+  text-align: center;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  color: $color-primary;
+  margin-bottom: $spacing-4;
+  animation: spin 2s linear infinite;
+}
+
+.loadingTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+}
+
+.loadingSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.loadingMessage {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.errorAlert {
+  margin-top: $spacing-4;
+  padding: $spacing-4;
+  background-color: $color-danger-light;
+  color: $color-danger-dark;
+  border-radius: $radius-md;
+  border: 1px solid $color-danger-border;
+}
+
+.errorMessage {
+  margin-bottom: $spacing-2;
+  font-size: $font-size-sm;
+}
+
+.errorRetryBtn {
+  background: transparent;
+  border: 1px solid $color-danger;
+  color: $color-danger;
+  padding: $spacing-1 $spacing-3;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $color-danger;
+    color: $color-surface-white;
   }
 }

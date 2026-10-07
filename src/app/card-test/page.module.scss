@@ -3,296 +3,168 @@
 
 .pageWrapper {
   height: 100dvh;
-  min-height: 100vh; // fallback for older browsers
+  min-height: 100vh;
   background-color: $color-bg-main;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: $spacing-3 $spacing-4 $spacing-4;
-  overflow-y: auto; // only scrolls on very small screens
+  padding: $spacing-4 $spacing-6;
+  overflow-y: auto;
 
   @media (min-width: $breakpoint-desktop) {
-    padding: $spacing-5 $spacing-8;
+    padding: $spacing-6 $spacing-10;
   }
 }
 
-.header {
+.topNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  max-width: 560px;
-  display: flex;
-  align-items: center;
-  margin-bottom: clamp(0px, 1vh, $spacing-2);
-  flex-shrink: 0;
+  margin-bottom: $spacing-8;
 }
 
-.backButton {
-  background: none;
-  border: none;
-  color: $color-text-secondary;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin-left: -$spacing-2;
-  transition: color 0.2s;
+.logoText {
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  color: $color-text-primary;
+}
 
-  &:hover {
-    color: $color-primary;
-  }
+.navRightText {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: $color-text-muted;
+  text-transform: uppercase;
 }
 
 .content {
   width: 100%;
-  max-width: 560px;
+  max-width: 720px;
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
 .title {
-  font-size: clamp(1.25rem, 3.2vh, 1.625rem);
-  font-weight: $font-weight-bold;
+  text-align: center;
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 900;
+  line-height: 1.2;
   color: $color-text-primary;
-  margin-bottom: $spacing-1;
-  line-height: $line-height-tight;
+  margin-bottom: $spacing-5;
+  letter-spacing: -0.02em;
 
-  @media (min-width: $breakpoint-desktop) {
-    text-align: center;
+  i {
+    font-weight: 400;
+    font-style: italic;
+    color: $color-text-primary;
   }
 }
 
 .subtitle {
-  font-size: $font-size-sm;
+  text-align: center;
+  font-size: 14px;
   color: $color-text-secondary;
-  margin-bottom: clamp($spacing-2, 1.8vh, $spacing-4);
-  line-height: $line-height-normal;
-
-  @media (min-width: $breakpoint-desktop) {
-    text-align: center;
-  }
-}
-
-.heroVisual {
-  width: 100%;
-  height: clamp(90px, 17vh, 150px);
-  background: $gradient-hero;
-  border-radius: $radius-lg;
-  margin-bottom: clamp($spacing-2, 1.8vh, $spacing-4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: $shadow-md;
-  flex-shrink: 1;
-
-  // Hide hero on very short screens so everything else still fits
-  @media (max-height: 640px) {
-    display: none;
-  }
-}
-
-.cardMockup {
-  width: clamp(130px, 22vh, 190px);
-  aspect-ratio: 1.7 / 1;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: $radius-md;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: $spacing-3;
-  position: relative;
-  z-index: 2;
-  transform: rotate(-5deg);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
-}
-
-.cardChip {
-  width: 28px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 4px;
-}
-
-.cardLines {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-1;
-}
-
-.cardLine {
-  height: 5px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-
-  &.short { width: 40%; }
-  &.long { width: 80%; }
-}
-
-.decorativeCircle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-
-  &.topRight {
-    width: 110px;
-    height: 110px;
-    top: -40px;
-    right: -15px;
-  }
-
-  &.bottomLeft {
-    width: 70px;
-    height: 70px;
-    bottom: -25px;
-    left: -15px;
-  }
-}
-
-.optionsTitle {
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
-  color: $color-text-primary;
-  margin-bottom: $spacing-2;
-
-  @media (min-width: $breakpoint-desktop) {
-    text-align: center;
-  }
+  max-width: 520px;
+  margin: 0 auto $spacing-12 auto;
+  line-height: 1.6;
 }
 
 .optionsList {
   display: flex;
-  flex-direction: row;
-  gap: $spacing-2;
-  margin-bottom: clamp($spacing-2, 1.8vh, $spacing-4);
-  /* Optional: allow overflow scrolling on tiny screens if cards don't fit */
-  overflow-x: auto;
-  padding-bottom: $spacing-1;
+  flex-direction: column;
+  gap: $spacing-6;
+  width: 100%;
+  
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
 }
 
 .optionCard {
+  flex: 1;
   background: $color-surface-white;
-  border: 1.5px solid $color-border;
-  border-radius: $radius-md;
-  padding: $spacing-3 $spacing-2;
-  flex: 1; /* expand horizontally to share space */
-  display: flex;
-  flex-direction: column; /* Stack vertically inside card */
-  align-items: center;
-  justify-content: flex-start;
-  gap: $spacing-2;
+  border: 1px solid $color-border;
+  border-radius: 16px;
+  padding: $spacing-6;
+  text-align: left;
+  position: relative;
   cursor: pointer;
-  text-align: center;
-  transition: all 0.2s ease-in-out;
-  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
-    border-color: $color-border-hover;
     background: $color-surface-subtle;
-  }
-
-  &:focus-visible {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px $color-primary-subtle;
+    border-color: $color-border-hover;
   }
 
   &.selected {
     border-color: $color-primary;
-    background: $color-primary-subtle;
-    box-shadow: $shadow-md;
+    box-shadow: 0 0 0 1px $color-primary;
   }
 }
 
-.optionIcon {
-  width: 38px;
-  height: 38px;
-  border-radius: $radius-full;
-  background: $color-bg-main;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $color-primary;
-  flex-shrink: 0;
-
-  .selected & {
-    background: $color-primary;
-    color: $color-surface-white;
-  }
+.fastestBadge {
+  position: absolute;
+  top: -12px;
+  right: 24px;
+  background: #4ade80;
+  color: #064e3b;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.05em;
 }
 
 .optionContent {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  gap: 2px;
+  height: 100%;
 }
 
-.optionTitle {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $color-text-primary;
-  line-height: $line-height-snug;
-}
-
-.optionSubtitle {
-  font-size: $font-size-xs;
-  color: $color-text-secondary;
-  line-height: $line-height-snug;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $spacing-2;
-  margin-top: $spacing-6;
-  flex-shrink: 0;
-}
-
-.continueButton {
-  width: 100%;
-  min-height: 46px; 
-  padding: $spacing-3;
-  background: $color-primary;
-  color: $color-text-on-primary;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
-  border: none;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: $shadow-md;
-
-  &:hover:not(:disabled) {
-    background: $color-primary-hover;
-    box-shadow: $shadow-lg;
-  }
-
-  &:disabled {
-    background: $color-border-strong;
-    color: $color-text-inverse;
-    opacity: 0.5;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-}
-
-.securityText {
-  font-size: $font-size-xs;
-  color: $color-text-muted;
+.optionIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: $color-surface-subtle;
+  border: 1px solid $color-border;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $spacing-1;
+  color: $color-primary;
+  margin-bottom: $spacing-5;
 }
 
-.securityIcon {
-  width: 14px;
-  height: 14px;
+.optionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: $spacing-3;
+}
+
+.optionSubtitle {
+  font-size: 13px;
+  color: $color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: $spacing-6;
+  flex: 1;
+}
+
+.optionLink {
+  font-size: 13px;
+  color: $color-primary;
+  font-weight: 600;
+}
+
+.footerText {
+  text-align: center;
+  font-size: 11px;
+  color: $color-text-muted;
+  margin-top: auto;
+  padding-top: $spacing-12;
+  margin-bottom: $spacing-4;
 }
