@@ -43,7 +43,49 @@ export function StatementSyncClient() {
   
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  // Upload state
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(e.target.files);
+    }
+  };
+
+  const handleFiles = (files: FileList | File[]) => {
+    const validFiles = Array.from(files).filter(f => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+    setUploadedFiles(prev => {
+      const newFiles = [...prev, ...validFiles];
+      return newFiles.slice(0, periodMonths); // Limit to periodMonths
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   // Timer for loading state
   useEffect(() => {
@@ -351,10 +393,79 @@ export function StatementSyncClient() {
               )}
             </div>
           ) : (
-            <div style={{ border: "2px dashed #cbd5e1", borderRadius: "8px", padding: "32px", textAlign: "center", color: "#64748b" }}>
-              <IconUpload width="32" height="32" style={{ marginBottom: "8px" }} />
-              <p>Drag and drop your PDFs here</p>
-              <p style={{ fontSize: "12px", marginTop: "4px" }}>Supports locked PDFs. Max {periodMonths} files.</p>
+            <div>
+              <div 
+                className={`${styles.uploadDropZone} ${dragActive ? styles.dragActive : ""}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className={styles.uploadIconWrap}>
+                  {/* Folder icon */}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div className={styles.uploadTextMain}>
+                  Drop PDFs here or <span className={styles.browseLink}>browse</span>
+                </div>
+                <div className={styles.uploadTextSub}>
+                  HDFC · Axis · ICICI · SBI · AMEX · Kotak
+                </div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: "none" }} 
+                  accept=".pdf,application/pdf"
+                  multiple
+                  onChange={handleFileSelect}
+                />
+              </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className={styles.uploadedFilesContainer}>
+                  <div className={styles.uploadedFilesHeader}>
+                    <span>{uploadedFiles.length} FILES ATTACHED</span>
+                    <button className={styles.clearAll} onClick={() => setUploadedFiles([])}>Clear all</button>
+                  </div>
+                  
+                  {uploadedFiles.map((file, i) => (
+                    <div key={i} className={styles.uploadedFileRow}>
+                      <div className={styles.fileIcon}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      </div>
+                      <div className={styles.fileDetails}>
+                        <div className={styles.fileName}>{file.name}</div>
+                        <div className={styles.fileSize}>{(file.size / 1024).toFixed(0)} KB</div>
+                      </div>
+                      <button className={styles.removeFile} onClick={() => removeFile(i)}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      </button>
+                    </div>
+                  ))}
+
+                  <div className={styles.uploadProgress}>
+                    <div className={styles.progressBar}>
+                      <div className={styles.progressFill} style={{ width: `${(uploadedFiles.length / periodMonths) * 100}%` }}></div>
+                    </div>
+                    <div className={styles.progressText}>{uploadedFiles.length} / {periodMonths} months</div>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.howItWorks}>
+                <p><strong>How it works:</strong> All PDFs are parsed together. Transactions are combined and averaged across {periodMonths} months to produce annualised spend vectors for the VS engine.</p>
+              </div>
+
+              {!loading && (
+                <button 
+                  className={styles.actionButton} 
+                  disabled={uploadedFiles.length === 0}
+                  onClick={() => console.log("Analyse uploaded files")}
+                >
+                  Analyse {uploadedFiles.length} Statements →
+                </button>
+              )}
             </div>
           )}
 
