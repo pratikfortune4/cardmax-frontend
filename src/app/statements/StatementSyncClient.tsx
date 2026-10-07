@@ -160,14 +160,8 @@ export function StatementSyncClient() {
     try {
       const response = await syncStatements(payload);
       if (response.success && response.data) {
-        setResults(response.data);
-        const allIds = new Set<string>();
-        response.data.statements_metadata.forEach((r: any) => allIds.add(r.id));
-        setSelectedIds(allIds);
-
-        setTimeout(() => {
-          resultsRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        sessionStorage.setItem("optimizationData", JSON.stringify(response.data));
+        router.push("/results");
       } else {
         throw new Error("Failed to fetch statements");
       }
@@ -608,17 +602,8 @@ export function StatementSyncClient() {
                     try {
                       const res = await optimizeUploadedStatements(uploadedFiles, profile);
                       if (res.success && res.data) {
-                        setResults(res.data);
-                        const allIds = new Set<string>();
-                        // Backend data format for optimize API might differ from gmail API,
-                        // handle it defensively or just route directly to dashboard
-                        if (res.data.statements_metadata) {
-                          res.data.statements_metadata.forEach((r: any) => allIds.add(r.id));
-                        }
-                        setSelectedIds(allIds);
-                        setTimeout(() => {
-                          resultsRef.current?.scrollIntoView({ behavior: "smooth" });
-                        }, 100);
+                        sessionStorage.setItem("optimizationData", JSON.stringify(res.data));
+                        router.push("/results");
                       }
                     } catch (err: any) {
                       setError(err.message || "Upload failed");
@@ -661,71 +646,6 @@ export function StatementSyncClient() {
             </div>
           )}
         </div>
-
-        {/* RESULTS SECTION */}
-        {results && (
-          <div className={styles.resultsSection} ref={resultsRef}>
-            <div className={styles.resultsHeader}>
-              {results.statement_count || (results.statements_metadata || []).length || 0} STATEMENT
-              {(results.statement_count || (results.statements_metadata || []).length) !== 1 ? "S" : ""} FOUND · {periodMonths}{" "}
-              MONTH{periodMonths !== 1 ? "S" : ""} ·{" "}
-              {(results.statements_metadata || []).length} CARD
-              {(results.statements_metadata || []).length !== 1 ? "S" : ""}
-            </div>
-
-            <div style={{ marginBottom: "16px" }}>
-              {(results.statements_metadata || []).map((r: any, idx: number) => (
-                <div key={r.id || idx} className={styles.resultRow}>
-                  <div className={styles.resultRowLeft}>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(r.id)}
-                      onChange={() => toggleRow(r.id)}
-                      style={{
-                        width: "16px",
-                        height: "16px",
-                        accentColor: "var(--color-primary, #000)",
-                      }}
-                    />
-                    <span className={styles.resultLabel}>
-                      {r.bank_slug || "Unknown"} · {(r.filename || r.name || `Statement ${idx + 1}`).replace(".pdf", "")}
-                    </span>
-                  </div>
-                  <span
-                    className={`${styles.resultStatus} ${r.status === "UNLOCKED" ? styles.unlocked : styles.locked}`}
-                  >
-                    {r.status || "UNLOCKED"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {results.skipped_reason && (
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#64748b",
-                  background: "#f1f5f9",
-                  padding: "12px",
-                  borderRadius: "6px",
-                  marginBottom: "24px",
-                  lineHeight: 1.5,
-                }}
-              >
-                {results.skipped_reason}
-              </p>
-            )}
-
-            <button
-              className={styles.actionButton}
-              onClick={handleAnalyze}
-              disabled={selectedIds.size === 0}
-            >
-              Analyse {selectedIds.size} Statement
-              {selectedIds.size !== 1 ? "s" : ""} →
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,0 +1,245 @@
+@use '../../styles/variables' as *;
+
+.container {
+  min-height: 100vh;
+  padding: $spacing-6 $spacing-4;
+  background-color: $color-bg-main;
+  color: $color-text-primary;
+  font-family: $font-sans;
+}
+
+.contentWrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: $spacing-4;
+
+  h1 {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-extrabold;
+    margin-bottom: $spacing-2;
+    color: $color-text-primary;
+  }
+
+  p {
+    color: $color-text-secondary;
+    font-size: $font-size-lg;
+  }
+}
+
+/* Glass Card styles -> adapted for light theme Card */
+.card {
+  background: $color-surface-white;
+  border: 1px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  box-shadow: $shadow-sm;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: $color-primary-subtle;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-5;
+    color: $color-text-primary;
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    
+    span {
+      font-size: $font-size-3xl;
+    }
+  }
+}
+
+/* Grid Layouts */
+.grid {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.metricCard {
+  background: $color-bg-light;
+  border-radius: $radius-md;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  border: 1px solid $color-border-subtle;
+
+  .label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: $font-weight-semibold;
+  }
+
+  .value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+  }
+}
+
+.highlightValue {
+  color: $color-success-dark !important;
+}
+
+/* Three Verdict Section */
+.verdictGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-4;
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.verdictItem {
+  background: $color-bg-light;
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  text-align: center;
+  border-top: 4px solid $color-border-strong;
+  border-left: 1px solid $color-border-subtle;
+  border-right: 1px solid $color-border-subtle;
+  border-bottom: 1px solid $color-border-subtle;
+
+  &.emerald { border-top-color: $color-success; }
+  &.indigo { border-top-color: $color-primary; }
+  &.blue { border-top-color: $color-cyan; }
+  &.red { border-top-color: $color-danger; }
+
+  .vLabel {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-3;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $font-weight-medium;
+  }
+  .vValue {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-text-primary;
+  }
+}
+
+/* Category Breakdown */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background: $color-bg-light;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-subtle;
+
+  .catName {
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+  }
+  .catValue {
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+}
+
+/* Basic Statement List (Fallback) */
+.statementList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.statementRow {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background: $color-bg-light;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  border: 1px solid $color-border-subtle;
+
+  .sName {
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+  }
+  .sStatus {
+    font-size: $font-size-xs;
+    padding: 2px 6px;
+    border-radius: $radius-sm;
+    background: $color-success-bg;
+    color: $color-success-dark;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-16 $spacing-5;
+  color: $color-text-muted;
+  font-size: $font-size-lg;
+
+  button {
+    margin-top: $spacing-5;
+    padding: $spacing-3 $spacing-6;
+    background: $color-primary;
+    color: $color-text-on-primary;
+    border: none;
+    border-radius: $radius-md;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+
+    &:hover {
+      background: $color-primary-hover;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.backButtonWrap {
+  text-align: center;
+  margin-top: $spacing-4;
+
+  button {
+    padding: $spacing-3 $spacing-6;
+    border-radius: $radius-md;
+    background: $color-surface-white;
+    color: $color-text-primary;
+    border: 1px solid $color-border;
+    cursor: pointer;
+    font-weight: $font-weight-semibold;
+    transition: all 0.2s;
+    box-shadow: $shadow-sm;
+
+    &:hover {
+      background: $color-bg-light;
+      border-color: $color-border-hover;
+      transform: translateY(-1px);
+    }
+  }
+}
