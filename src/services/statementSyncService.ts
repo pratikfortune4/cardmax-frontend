@@ -59,4 +59,34 @@ export const syncStatements = async (payload: StatementSyncPayload) => {
     console.error("Error in syncStatements:", error);
     throw new Error(error.message || "Network error occurred");
   }
+}
+
+// ----------------------------------------------------
+// MANUAL SPEND JOURNEY
+// ----------------------------------------------------
+
+export interface ManualSpendPayload {
+  profile: StatementSyncProfile;
+  fuelPreference: string;
+  vectorValues: Record<string, number>;
+  selectedCards: string[];
+}
+
+export async function submitManualSpends(
+  payload: ManualSpendPayload
+): Promise<{ success: boolean; matrixId: string }> {
+  // PLACEHOLDER ENDPOINT
+  // const response = await fetch(`${API_BASE_URL}/manual-spends/submit`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify(payload),
+  // });
+  // return response.json();
+
+  // Mock fallback
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ success: true, matrixId: "mock-matrix-123" });
+    }, 1500);
+  });
 };

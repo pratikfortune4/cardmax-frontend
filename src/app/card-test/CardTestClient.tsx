@@ -16,8 +16,8 @@ export function CardTestClient() {
     setSelectedMethod(method);
     if (method === "statements") {
       router.push("/statements");
-    } else {
-      console.log("Navigate to expenses journey");
+    } else if (method === "expenses") {
+      router.push("/manual");
     }
   };
 
