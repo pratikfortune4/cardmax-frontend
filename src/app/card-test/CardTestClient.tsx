@@ -5,36 +5,19 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import {
   IconLock,
-  IconGoogle,
-  IconUpload,
-  IconMonitor,
   IconArrowLeft,
 } from "@/components/Icons";
 
-type TestMethod = "expenses" | "statements" | "gmail";
-
 export function CardTestClient() {
   const router = useRouter();
-  const [selectedMethod, setSelectedMethod] = useState<TestMethod | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<"statements" | "expenses" | null>(null);
 
-  const handleMethodSelect = (method: TestMethod) => {
+  const handleMethodSelect = (method: "statements" | "expenses") => {
     setSelectedMethod(method);
-  };
-
-  const handleContinue = () => {
-    switch (selectedMethod) {
-      case "expenses":
-        // TODO: connect to future expense journey
-        console.log("Navigate to expenses journey");
-        break;
-      case "statements":
-        // TODO: connect to future statement journey
-        console.log("Navigate to statements journey");
-        break;
-      case "gmail":
-        // TODO: connect to future Gmail journey
-        console.log("Navigate to gmail journey");
-        break;
+    if (method === "statements") {
+      router.push("/statements");
+    } else {
+      console.log("Navigate to expenses journey");
     }
   };
 
@@ -47,73 +30,61 @@ export function CardTestClient() {
       </div>
 
       <div className={styles.content}>
-        <h1 className={styles.title}>Take the Right Card Test</h1>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+          <span style={{ background: "rgba(0, 0, 0, 0.05)", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: 600 }}>
+            240 cards priced live
+          </span>
+        </div>
+        <h1 className={styles.title}>
+          Drop a statement.<br />
+          The market fights for it.
+        </h1>
         <p className={styles.subtitle}>
-          Find out which credit cards fit your spending habits and discover how
-          to get more value from your cards.
+          Every card in India is priced against your real spending, alone and in combos of three. Net rupees after every fee, cap and surcharge.
         </p>
 
-        <h2 className={styles.optionsTitle}>
-          How would you like to get started?
-        </h2>
-
-        <div className={styles.optionsList}>
-          {/* Expenses Option */}
+        <div className={styles.optionsList} style={{ flexDirection: "column" }}>
+          {/* Option A */}
           <button
-            className={`${styles.optionCard} ${selectedMethod === "expenses" ? styles.selected : ""}`}
-            onClick={() => handleMethodSelect("expenses")}
+            className={`${styles.optionCard} ${selectedMethod === "statements" ? styles.selected : ""}`}
+            onClick={() => handleMethodSelect("statements")}
+            style={{ textAlign: "left", alignItems: "flex-start" }}
           >
-            <div className={styles.optionIcon}>
-              <IconMonitor width="20" height="20" />
-            </div>
-            <div className={styles.optionContent}>
-              <span className={styles.optionTitle}>Enter Expenses</span>
-              <span className={styles.optionSubtitle}>
-                Based on your spending habits
+            <div className={styles.optionContent} style={{ alignItems: "flex-start" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className={styles.optionTitle}>Run it on my statements</span>
+                <span style={{ background: "#4ade80", color: "#064e3b", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", fontWeight: 700 }}>
+                  FASTEST
+                </span>
+              </div>
+              <span className={styles.optionSubtitle} style={{ marginTop: "4px", marginBottom: "8px" }}>
+                Sync from Gmail in one click or drop bank PDFs. Locked files unlock themselves. 3, 6 or 12 months.
+              </span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-primary, #000)" }}>
+                The real thing →
               </span>
             </div>
           </button>
 
-          {/* Statements Option */}
+          {/* Option B */}
           <button
-            className={`${styles.optionCard} ${selectedMethod === "statements" ? styles.selected : ""}`}
-            onClick={() => handleMethodSelect("statements")}
+            className={`${styles.optionCard} ${selectedMethod === "expenses" ? styles.selected : ""}`}
+            onClick={() => handleMethodSelect("expenses")}
+            style={{ textAlign: "left", alignItems: "flex-start" }}
           >
-            <div className={styles.optionIcon}>
-              <IconUpload width="20" height="20" />
-            </div>
-            <div className={styles.optionContent}>
-              <span className={styles.optionTitle}>Upload Statements</span>
-              <span className={styles.optionSubtitle}>PDF from your bank</span>
-            </div>
-          </button>
-
-          {/* Gmail Option */}
-          <button
-            className={`${styles.optionCard} ${selectedMethod === "gmail" ? styles.selected : ""}`}
-            onClick={() => handleMethodSelect("gmail")}
-          >
-            <div className={styles.optionIcon}>
-              <IconGoogle width="20" height="20" />
-            </div>
-            <div className={styles.optionContent}>
-              <span className={styles.optionTitle}>Scan Gmail</span>
-              <span className={styles.optionSubtitle}>
-                Securely & privately
+            <div className={styles.optionContent} style={{ alignItems: "flex-start" }}>
+              <span className={styles.optionTitle}>Feed my spends by hand</span>
+              <span className={styles.optionSubtitle} style={{ marginTop: "4px", marginBottom: "8px" }}>
+                No statement handy, or new to credit? Declare monthly spends across every category. Full control.
+              </span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-primary, #000)" }}>
+                Power user mode →
               </span>
             </div>
           </button>
         </div>
 
         <div className={styles.actions}>
-          <button
-            className={styles.continueButton}
-            onClick={handleContinue}
-            disabled={!selectedMethod}
-          >
-            Continue
-          </button>
-
           <div className={styles.securityText}>
             <IconLock className={styles.securityIcon} width="14" height="14" />
             Your information is safe and secure
