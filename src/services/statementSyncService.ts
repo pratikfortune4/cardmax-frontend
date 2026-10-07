@@ -1,7 +1,8 @@
 import { API_BASE_URL } from "@/lib/api";
 
 export interface StatementSyncProfile {
-  annualIncome: string;
+  monthlySpend: string;
+  fdSpend: string;
   employmentType: string;
   portfolioSize: string;
   loungeAccess: string;

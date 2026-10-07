@@ -1,6 +1,6 @@
 import React from "react";
-import { ManualSpendClient } from "./ManualSpendClient";
 import { Metadata } from "next";
+import { ManualSpendClient } from "./ManualSpendClient";
 
 export const metadata: Metadata = {
   title: "Manual Spend Setup | CardMax",

@@ -4,43 +4,24 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import { IconArrowLeft, IconSearch, IconX } from "@/components/Icons";
-import { SPEND_VECTORS, SpendTab } from "@/config/spendVectors";
+import { SPEND_VECTORS } from "@/config/spendVectors";
 import {
   StatementSyncProfile,
   submitManualSpends,
 } from "@/services/statementSyncService";
 
-const REWARD_GOALS = [
-  "Auto (recommended)",
-  "Money Back",
-  "Bank Portal (SmartBuy / Edge)",
-  "Voucher Redemption",
-  "Miles & Hotel Points",
-];
 const BANKS = ["HDFC", "ICICI", "SBI", "Axis", "Kotak", "Other"];
-const TABS: SpendTab[] = [
-  "Everyday spends",
-  "Apps & Ecosystems",
-  "Rent, Tax & Other",
-];
 
 export function ManualSpendClient() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<StatementSyncProfile>({
-    annualIncome: "15,00,000",
-    employmentType: "Salaried",
+    monthlySpend: "",
+    fdSpend: "",
     portfolioSize: "Up to 3, engine decides",
-    loungeAccess: "Doesn't matter, pure value",
-    fullName: "",
-    dob: "",
-    mobileNumber: "",
-    primaryRewardGoals: ["Auto (recommended)"],
     banksUsed: [],
   });
 
-  const [fuelPreference, setFuelPreference] = useState("I'm not sure / varies");
-  const [activeTab, setActiveTab] = useState<SpendTab>("Everyday spends");
   const [vectorValues, setVectorValues] = useState<Record<string, number>>({});
 
   // Cards held functionality
@@ -48,9 +29,11 @@ export function ManualSpendClient() {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ income?: string; mobile?: string }>(
-    {},
-  );
+  const [errors, setErrors] = useState<{
+    monthlySpend?: string;
+    fdSpend?: string;
+    mobile?: string;
+  }>({});
 
   const toggleBank = (bank: string) => {
     setProfile((prev) => {
@@ -61,33 +44,6 @@ export function ManualSpendClient() {
           ? prev.banksUsed.filter((b) => b !== bank)
           : [...prev.banksUsed, bank],
       };
-    });
-  };
-
-  const toggleRewardGoal = (goal: string) => {
-    setProfile((prev) => {
-      if (goal === "Auto (recommended)") {
-        return { ...prev, primaryRewardGoals: [goal] };
-      }
-      let newGoals = prev.primaryRewardGoals.filter(
-        (g) => g !== "Auto (recommended)",
-      );
-      const isSelected = newGoals.includes(goal);
-
-      if (isSelected) {
-        newGoals = newGoals.filter((g) => g !== goal);
-      } else {
-        if (newGoals.length < 2) {
-          newGoals.push(goal);
-        } else {
-          newGoals = [newGoals[1], goal]; // Keep latest 2
-        }
-      }
-
-      if (newGoals.length === 0) {
-        newGoals = ["Auto (recommended)"];
-      }
-      return { ...prev, primaryRewardGoals: newGoals };
     });
   };
 
@@ -116,26 +72,19 @@ export function ManualSpendClient() {
     (val) => val > 0,
   ).length;
 
-  const getTabCount = (tab: SpendTab) => {
-    return SPEND_VECTORS.filter(
-      (v) => v.tab === tab && (vectorValues[v.id] || 0) > 0,
-    ).length;
-  };
-
   const handleSubmit = async () => {
     // Validate
-    const newErrors: { income?: string; mobile?: string } = {};
-    const incomeNum = parseInt(
-      profile.annualIncome.replace(/\D/g, "") || "0",
-      10,
-    );
-    if (incomeNum <= 0) {
-      newErrors.income = "Annual income is required";
+    const newErrors: {
+      monthlySpend?: string;
+      fdSpend?: string;
+      mobile?: string;
+    } = {};
+    if (!profile.monthlySpend) {
+      newErrors.monthlySpend = "Monthly spend is required";
     }
-    if (profile.mobileNumber && profile.mobileNumber.length !== 10) {
-      newErrors.mobile = "Mobile number must be exactly 10 digits";
+    if (!profile.fdSpend) {
+      newErrors.fdSpend = "FD spend is required";
     }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -146,7 +95,6 @@ export function ManualSpendClient() {
     try {
       const response = await submitManualSpends({
         profile,
-        fuelPreference,
         vectorValues,
         selectedCards,
       });
@@ -154,15 +102,14 @@ export function ManualSpendClient() {
       router.push("/dashboard"); // or results route
     } catch (e) {
       console.error(e);
-      setErrors({ ...errors, income: "Failed to submit. Please try again." });
+      setErrors({
+        ...errors,
+        monthlySpend: "Failed to submit. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
   };
-
-  // Grouping vectors for current tab
-  const currentTabVectors = SPEND_VECTORS.filter((v) => v.tab === activeTab);
-  const groups = Array.from(new Set(currentTabVectors.map((v) => v.group)));
 
   return (
     <div className={styles.pageWrapper}>
@@ -176,140 +123,74 @@ export function ManualSpendClient() {
           className={styles.headerTitle}
           style={{ color: "var(--color-text-muted)" }}
         >
-          MAXYIELD MATRIX SETUP
+          CARDMAX
         </span>
       </div>
 
       <div className={styles.content}>
-        {/* UNDERWRITING PROFILE */}
+        {/* PROFILE */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>UNDERWRITING PROFILE</span>
-            <p className={styles.sectionHelper}>
-              Used to filter ineligible cards and enforce employment compliance
-            </p>
+            <span className={styles.sectionLabel}>EXPENSES</span>
           </div>
 
           <div className={styles.formRow}>
             <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>Annual Income</label>
-              <div style={{ position: "relative" }}>
+              <label className={styles.formLabel}>
+                What is your approximate monthly spend?
+              </label>
+              <div style={{ position: "relative", marginTop: "8px" }}>
                 <span className={styles.inputPrefix}>₹</span>
                 <input
-                  className={`${styles.formInput} ${errors.income ? styles.inputError : ""}`}
+                  className={`${styles.formInput} ${errors.monthlySpend ? styles.inputError : ""}`}
                   style={{ paddingLeft: "32px" }}
-                  value={profile.annualIncome}
+                  value={profile.monthlySpend}
                   onChange={(e) => {
                     let val = e.target.value.replace(/\D/g, "");
                     if (val) {
                       val = parseInt(val, 10).toLocaleString("en-IN");
                     }
-                    setProfile({ ...profile, annualIncome: val });
+                    setProfile({ ...profile, monthlySpend: val });
                   }}
+                  placeholder="e.g. 50,000"
                 />
               </div>
-              {errors.income ? (
-                <p className={styles.errorText}>{errors.income}</p>
+              {errors.monthlySpend ? (
+                <p className={styles.errorText}>{errors.monthlySpend}</p>
               ) : (
                 <p className={styles.formHelper}>
-                  {profile.annualIncome
-                    ? `₹${(parseInt(profile.annualIncome.replace(/\D/g, ""), 10) / 100000).toFixed(1).replace(".0", "")} LPA`
-                    : "0 LPA"}
+                  This helps us estimate your potential rewards and savings.
                 </p>
               )}
             </div>
 
             <div className={styles.formGroup} style={{ flex: 1 }}>
               <label className={styles.formLabel}>
-                Full Name{" "}
-                <span className={styles.formHelper} style={{ margin: 0 }}>
-                  (optional)
-                </span>
+                How much do you want to spend on FD ?
               </label>
-              <input
-                className={styles.formInput}
-                placeholder="As on your card"
-                value={profile.fullName}
-                onChange={(e) =>
-                  setProfile({ ...profile, fullName: e.target.value })
-                }
-              />
-              <p className={styles.formHelper}>
-                Auto-unlocks your statements. Saved to your account, delete
-                anytime.
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>
-                Date of Birth{" "}
-                <span className={styles.formHelper} style={{ margin: 0 }}>
-                  (optional)
-                </span>
-              </label>
-              <input
-                type="date"
-                className={styles.formInput}
-                value={profile.dob}
-                onChange={(e) =>
-                  setProfile({ ...profile, dob: e.target.value })
-                }
-              />
-              <p className={styles.formHelper}>
-                Enables birthday rewards, age-based eligibility + statement
-                unlock.
-              </p>
-            </div>
-
-            <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>
-                Mobile Number{" "}
-                <span className={styles.formHelper} style={{ margin: 0 }}>
-                  (optional)
-                </span>
-              </label>
-              <input
-                type="tel"
-                maxLength={10}
-                className={`${styles.formInput} ${errors.mobile ? styles.inputError : ""}`}
-                placeholder="10-digit mobile"
-                value={profile.mobileNumber}
-                onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    mobileNumber: e.target.value.replace(/\D/g, ""),
-                  })
-                }
-              />
-              {errors.mobile ? (
-                <p className={styles.errorText}>{errors.mobile}</p>
+              <div style={{ position: "relative", marginTop: "8px" }}>
+                <span className={styles.inputPrefix}>₹</span>
+                <input
+                  className={`${styles.formInput} ${errors.fdSpend ? styles.inputError : ""}`}
+                  style={{ paddingLeft: "32px" }}
+                  value={profile.fdSpend}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, "");
+                    if (val) {
+                      val = parseInt(val, 10).toLocaleString("en-IN");
+                    }
+                    setProfile({ ...profile, fdSpend: val });
+                  }}
+                  placeholder="e.g. 1,00,000"
+                />
+              </div>
+              {errors.fdSpend ? (
+                <p className={styles.errorText}>{errors.fdSpend}</p>
               ) : (
                 <p className={styles.formHelper}>
-                  For your reports and statement unlock only. No OTP, no
-                  marketing. Saved to your account, delete anytime.
+                  This helps us estimate your potential rewards and savings.
                 </p>
               )}
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>Employment Type</label>
-              <select
-                className={styles.formSelect}
-                value={profile.employmentType}
-                onChange={(e) =>
-                  setProfile({ ...profile, employmentType: e.target.value })
-                }
-              >
-                <option value="Salaried">Salaried</option>
-                <option value="Self-Employed">Self-Employed</option>
-              </select>
-              <p className={styles.formHelper}>
-                Business/corporate cards will be excluded
-              </p>
             </div>
           </div>
 
@@ -373,50 +254,7 @@ export function ManualSpendClient() {
               ))}
             </div>
           </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Airport Lounge Access</label>
-            <select
-              className={styles.formSelect}
-              value={profile.loungeAccess}
-              onChange={(e) =>
-                setProfile({ ...profile, loungeAccess: e.target.value })
-              }
-            >
-              <option value="Doesn't matter, pure value">
-                Doesn't matter, pure value
-              </option>
-              <option value="Domestic required">Domestic required</option>
-              <option value="International required">
-                International required
-              </option>
-            </select>
-          </div>
         </div>
-
-        {/* FUEL BRAND */}
-        <div className={styles.section}>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Fuel Brand Preference</label>
-            <p className={styles.formHelper}>
-              Fuel co-brand cards earn their big rates only at their own
-              company's pumps, telling us yours makes that math exact.
-            </p>
-            <select
-              className={styles.formSelect}
-              value={fuelPreference}
-              onChange={(e) => setFuelPreference(e.target.value)}
-            >
-              <option value="I'm not sure / varies">
-                I'm not sure / varies
-              </option>
-              <option value="HPCL">HPCL</option>
-              <option value="IOCL">IOCL</option>
-              <option value="BPCL">BPCL</option>
-            </select>
-          </div>
-        </div>
-
         {/* MONTHLY SPEND VECTORS */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
@@ -427,112 +265,17 @@ export function ManualSpendClient() {
             </p>
           </div>
 
-          <div className={styles.tabs}>
-            {TABS.map((tab) => (
-              <div
-                key={tab}
-                className={`${styles.tab} ${activeTab === tab ? styles.active : ""}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
-                  {tab}
-                  <span className={`${styles.badge} ${styles.countBadge}`}>
-                    {getTabCount(tab)} set
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
           {/* VECTORS RENDER */}
           <div className={styles.vectorsGrid}>
-            {activeTab === "Everyday spends" ? (
-              <>
-                <div className={styles.vectorColumn}>
-                  {[
-                    "ONLINE & TRAVEL",
-                    "OPTIONAL: SPLIT YOUR TRAVEL FOR SHARPER MATH",
-                  ].map((group) => {
-                    const vectors = currentTabVectors.filter(
-                      (v) => v.group === group,
-                    );
-                    if (vectors.length === 0) return null;
-                    return (
-                      <div
-                        key={group}
-                        className={styles.vectorGroup}
-                        style={{ marginBottom: "24px" }}
-                      >
-                        <div className={styles.vectorGroupLabel}>{group}</div>
-                        <div className={styles.vectorsList}>
-                          {vectors.map((vector) => (
-                            <VectorCard
-                              key={vector.id}
-                              vector={vector}
-                              val={vectorValues[vector.id] || 0}
-                              onChange={handleVectorChange}
-                              styles={styles}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className={styles.vectorColumn}>
-                  {["OFFLINE, FUEL & UPI"].map((group) => {
-                    const vectors = currentTabVectors.filter(
-                      (v) => v.group === group,
-                    );
-                    if (vectors.length === 0) return null;
-                    return (
-                      <div
-                        key={group}
-                        className={styles.vectorGroup}
-                        style={{ marginBottom: "24px" }}
-                      >
-                        <div className={styles.vectorGroupLabel}>{group}</div>
-                        <div className={styles.vectorsList}>
-                          {vectors.map((vector) => (
-                            <VectorCard
-                              key={vector.id}
-                              vector={vector}
-                              val={vectorValues[vector.id] || 0}
-                              onChange={handleVectorChange}
-                              styles={styles}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              groups.map((group) => {
-                const vectors = currentTabVectors.filter(
-                  (v) => v.group === group,
-                );
-                return (
-                  <div key={group} className={styles.vectorGroup}>
-                    <div className={styles.vectorGroupLabel}>{group}</div>
-                    <div className={styles.vectorsList}>
-                      {vectors.map((vector) => (
-                        <VectorCard
-                          key={vector.id}
-                          vector={vector}
-                          val={vectorValues[vector.id] || 0}
-                          onChange={handleVectorChange}
-                          styles={styles}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
-            )}
+            {SPEND_VECTORS.map((vector) => (
+              <VectorCard
+                key={vector.id}
+                vector={vector}
+                val={vectorValues[vector.id] || 0}
+                onChange={handleVectorChange}
+                styles={styles}
+              />
+            ))}
           </div>
         </div>
 
@@ -588,57 +331,25 @@ export function ManualSpendClient() {
             )}
           </div>
 
-          <div className={styles.sectionHeader} style={{ marginTop: "32px" }}>
-            <span className={styles.sectionLabel}>REWARD GOAL (OPTIONAL)</span>
-            <p className={styles.sectionHelper}>
-              Auto picks the best 1-3 card combo for your spend and income.
-              Change it only if you want a specific redemption style.
-            </p>
-          </div>
-
-          <div className={styles.formGroup}>
-            <div
-              className={styles.multiSelectGrid}
-              style={{
-                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-              }}
-            >
-              {REWARD_GOALS.map((g) => (
-                <button
-                  key={g}
-                  className={`${styles.pillButton} ${profile.primaryRewardGoals.includes(g) ? styles.active : ""}`}
-                  onClick={() => toggleRewardGoal(g)}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-            <p className={styles.formHelper} style={{ marginTop: "8px" }}>
-              Auto ranks every card by its guaranteed redemption value. Money
-              Back covers statement cashback, statement credit and co-brand
-              wallet money.
-            </p>
-
-            <div className={styles.stickyFooter}>
-              <div className={styles.footerTotals}>
-                <div className={styles.footerLabel}>TOTAL MONTHLY SPEND</div>
-                <div className={styles.footerBigTotal}>
-                  ₹{totalMonthlySpend.toLocaleString("en-IN")}
-                </div>
-                <div className={styles.footerSubTotal}>
-                  ₹{yearlySpend.toLocaleString("en-IN")} /yr ·{" "}
-                  {activeVectorCount} active vector
-                  {activeVectorCount !== 1 ? "s" : ""}
-                </div>
+          <div className={styles.stickyFooter}>
+            <div className={styles.footerTotals}>
+              <div className={styles.footerLabel}>TOTAL MONTHLY SPEND</div>
+              <div className={styles.footerBigTotal}>
+                ₹{totalMonthlySpend.toLocaleString("en-IN")}
               </div>
-              <button
-                className={styles.submitBtn}
-                onClick={handleSubmit}
-                disabled={totalMonthlySpend === 0 || loading}
-              >
-                {loading ? "Generating..." : "Generate MaxYield Matrix →"}
-              </button>
+              <div className={styles.footerSubTotal}>
+                ₹{yearlySpend.toLocaleString("en-IN")} /yr · {activeVectorCount}{" "}
+                active vector
+                {activeVectorCount !== 1 ? "s" : ""}
+              </div>
             </div>
+            <button
+              className={styles.submitBtn}
+              onClick={handleSubmit}
+              disabled={totalMonthlySpend === 0 || loading}
+            >
+              {loading ? "Generating..." : "Generate MaxYield Matrix →"}
+            </button>
           </div>
         </div>
       </div>
