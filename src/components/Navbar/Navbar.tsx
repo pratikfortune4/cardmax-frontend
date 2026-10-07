@@ -1,134 +1,158 @@
-'use client'
-import { IconArrowRight, IconLogOut, IconShield, IconUser, IconMonitor, IconWallet, IconLayoutGrid, IconMenu, IconX, IconChevronDown, IconCreditCard } from '@/components/Icons';
+"use client";
+import {
+  IconArrowRight,
+  IconLogOut,
+  IconShield,
+  IconUser,
+  IconMonitor,
+  IconWallet,
+  IconLayoutGrid,
+  IconMenu,
+  IconX,
+  IconChevronDown,
+  IconCreditCard,
+} from "@/components/Icons";
 
-
-import React, { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { API_BASE_URL } from '@/lib/api'
-import './Navbar.scss'
-import { NotificationBell } from '../NotificationBell/NotificationBell'
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { API_BASE_URL } from "@/lib/api";
+import "./Navbar.scss";
+import { NotificationBell } from "../NotificationBell/NotificationBell";
 
 export interface NavbarUser {
-  id: string
-  email: string
-  name?: string | null
-  isPro?: boolean
+  id: string;
+  email: string;
+  name?: string | null;
+  isPro?: boolean;
 }
 
 interface NavbarProps {
-  initialUser?: NavbarUser | null
+  initialUser?: NavbarUser | null;
 }
 
 const HIDDEN_ROUTES = [
-  '/login',
-  '/logout',
-  '/consent-onboarding',
-  '/complete-profile',
-]
+  "/login",
+  "/logout",
+  "/consent-onboarding",
+  "/complete-profile",
+];
 
 export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
-  const pathname = usePathname()
-  const [user, setUser] = useState<NavbarUser | null>(initialUser ?? null)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [loggingOut, setLoggingOut] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname();
+  const [user, setUser] = useState<NavbarUser | null>(initialUser ?? null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Keep state synchronized with prop updates
   useEffect(() => {
     if (initialUser !== undefined) {
-      setUser(initialUser)
+      setUser(initialUser);
     }
-  }, [initialUser])
+  }, [initialUser]);
 
   // Synchronize auth state on route changes (ensures clean guest/auth transitions)
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+          credentials: "include",
+        });
         if (res.ok) {
-          const data = await res.json()
+          const data = await res.json();
           if (data?.user) {
             setUser({
               id: String(data.user.id),
               email: data.user.email,
               name: data.user.name || data.user.firstName || null,
               isPro: data.user.isPro ?? false,
-            })
+            });
           } else {
-            setUser(null)
+            setUser(null);
           }
         } else {
-          setUser(null)
+          setUser(null);
         }
       } catch {
         // Non-blocking
       }
-    }
-    checkAuth()
-  }, [pathname])
+    };
+    checkAuth();
+  }, [pathname]);
 
   // Close menus when route changes
   useEffect(() => {
-    setDropdownOpen(false)
-    setMobileMenuOpen(false)
-  }, [pathname])
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   // Click outside listener for dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
       }
-    }
+    };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setDropdownOpen(false)
-        setMobileMenuOpen(false)
+      if (event.key === "Escape") {
+        setDropdownOpen(false);
+        setMobileMenuOpen(false);
       }
-    }
+    };
 
     if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [dropdownOpen])
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [dropdownOpen]);
 
   // Hide completely on login, logout, and onboarding flows
   const shouldHide = HIDDEN_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  )
+    (route) => pathname === route || pathname.startsWith(route + "/"),
+  );
   if (shouldHide) {
-    return null
+    return null;
   }
 
   const handleLogout = async () => {
-    setLoggingOut(true)
+    setLoggingOut(true);
     try {
-      await fetch(`${API_BASE_URL}/api/users/logout`, { method: 'POST', credentials: 'include' })
+      await fetch(`${API_BASE_URL}/api/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
     } catch {
       // Continue to redirect regardless
     } finally {
-      setUser(null)
-      window.location.href = '/'
+      setUser(null);
+      window.location.href = "/";
     }
-  }
+  };
 
-  const navLinks: Array<{ label: string; href: string; isProHighlight?: boolean }> = [
-    { label: 'Dashboard', href: '/' },
-    { label: 'Wallet', href: '/wallet' },
-    { label: 'Profile', href: '/profile' },
-  ]
+  const navLinks: Array<{
+    label: string;
+    href: string;
+    isProHighlight?: boolean;
+  }> = [
+    { label: "Dashboard", href: "/" },
+    { label: "Wallet", href: "/wallet" },
+    { label: "Card Test", href: "/card-test" },
+    { label: "Profile", href: "/profile" },
+  ];
 
-  const displayName = user?.name || user?.email?.split('@')[0] || 'Member'
-  const userInitial = displayName.charAt(0).toUpperCase() || 'U'
+  const displayName = user?.name || user?.email?.split("@")[0] || "Member";
+  const userInitial = displayName.charAt(0).toUpperCase() || "U";
 
   return (
     <header className="cm-navbar-container">
@@ -147,12 +171,12 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
         {/* Desktop Navigation Links */}
         <nav className="cm-navbar__nav" aria-label="Main Navigation">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href
+            const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`cm-nav-link ${isActive ? 'is-active' : ''}`}
+                className={`cm-nav-link ${isActive ? "is-active" : ""}`}
               >
                 <span>{link.label}</span>
                 {link.isProHighlight && (
@@ -161,39 +185,41 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
                   </span>
                 )}
               </Link>
-            )
+            );
           })}
         </nav>
 
         {/* Actions (Right) */}
         <div className="cm-navbar__actions">
-          {user && (
-            <NotificationBell userId={user.id} />
-          )}
+          {user && <NotificationBell userId={user.id} />}
           {user ? (
             <div className="cm-profile-dropdown" ref={dropdownRef}>
               <button
                 type="button"
-                className={`cm-profile-trigger ${dropdownOpen ? 'is-open' : ''}`}
+                className={`cm-profile-trigger ${dropdownOpen ? "is-open" : ""}`}
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 aria-expanded={dropdownOpen}
                 aria-haspopup="true"
                 aria-label="User Profile Menu"
               >
-                <div className="cm-avatar">
-                  {userInitial}
-                </div>
+                <div className="cm-avatar">{userInitial}</div>
                 <div className="cm-profile-trigger__info">
                   <span className="cm-user-name">{displayName}</span>
                 </div>
-                <IconChevronDown className={`cm-chevron ${dropdownOpen ? 'is-open' : ''}`} />
+                <IconChevronDown
+                  className={`cm-chevron ${dropdownOpen ? "is-open" : ""}`}
+                />
               </button>
 
               {dropdownOpen && (
                 <div className="cm-dropdown-menu" role="menu">
                   <div className="cm-dropdown-header">
-                    <span className="cm-dropdown-header__name">{displayName}</span>
-                    <span className="cm-dropdown-header__email">{user.email}</span>
+                    <span className="cm-dropdown-header__name">
+                      {displayName}
+                    </span>
+                    <span className="cm-dropdown-header__email">
+                      {user.email}
+                    </span>
                   </div>
 
                   <Link href="/" className="cm-dropdown-item" role="menuitem">
@@ -201,18 +227,29 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
                     Dashboard
                   </Link>
 
-                  <Link href="/wallet" className="cm-dropdown-item" role="menuitem">
+                  <Link
+                    href="/wallet"
+                    className="cm-dropdown-item"
+                    role="menuitem"
+                  >
                     <IconWallet />
                     My Cards & Wallet
                   </Link>
 
-                  <Link href="/profile" className="cm-dropdown-item" role="menuitem">
+                  <Link
+                    href="/profile"
+                    className="cm-dropdown-item"
+                    role="menuitem"
+                  >
                     <IconUser />
                     Account Profile
                   </Link>
 
-
-                  <Link href="/settings/consent" className="cm-dropdown-item" role="menuitem">
+                  <Link
+                    href="/settings/consent"
+                    className="cm-dropdown-item"
+                    role="menuitem"
+                  >
                     <IconShield />
                     Consent & Privacy
                   </Link>
@@ -227,7 +264,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
                     role="menuitem"
                   >
                     <IconLogOut />
-                    {loggingOut ? 'Signing out…' : 'Sign Out'}
+                    {loggingOut ? "Signing out…" : "Sign Out"}
                   </button>
                 </div>
               )}
@@ -247,23 +284,22 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? (
-              <IconX />
-            ) : (
-              <IconMenu />
-            )}
+            {mobileMenuOpen ? <IconX /> : <IconMenu />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="cm-mobile-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+        <div
+          className="cm-mobile-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation"
+        >
           {user && (
             <div className="cm-mobile-user-card">
-              <div className="cm-avatar">
-                {userInitial}
-              </div>
+              <div className="cm-avatar">{userInitial}</div>
               <div className="cm-mobile-user-info">
                 <div className="cm-mobile-user-name">{displayName}</div>
                 <div className="cm-mobile-user-email">{user.email}</div>
@@ -274,7 +310,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
           <div className="cm-mobile-nav-list">
             <Link
               href="/"
-              className={`cm-mobile-nav-link ${pathname === '/' ? 'is-active' : ''}`}
+              className={`cm-mobile-nav-link ${pathname === "/" ? "is-active" : ""}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="cm-mobile-nav-link__title">
@@ -285,7 +321,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
 
             <Link
               href="/wallet"
-              className={`cm-mobile-nav-link ${pathname === '/wallet' ? 'is-active' : ''}`}
+              className={`cm-mobile-nav-link ${pathname === "/wallet" ? "is-active" : ""}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="cm-mobile-nav-link__title">
@@ -294,10 +330,9 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
               </span>
             </Link>
 
-
             <Link
               href="/profile"
-              className={`cm-mobile-nav-link ${pathname === '/profile' ? 'is-active' : ''}`}
+              className={`cm-mobile-nav-link ${pathname === "/profile" ? "is-active" : ""}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="cm-mobile-nav-link__title">
@@ -308,7 +343,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
 
             <Link
               href="/settings/consent"
-              className={`cm-mobile-nav-link ${pathname === '/settings/consent' ? 'is-active' : ''}`}
+              className={`cm-mobile-nav-link ${pathname === "/settings/consent" ? "is-active" : ""}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="cm-mobile-nav-link__title">
@@ -327,7 +362,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
                 disabled={loggingOut}
               >
                 <IconLogOut />
-                {loggingOut ? 'Signing out…' : 'Sign Out of CardMax'}
+                {loggingOut ? "Signing out…" : "Sign Out of CardMax"}
               </button>
             ) : (
               <Link
@@ -343,5 +378,5 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
         </div>
       )}
     </header>
-  )
-}
+  );
+};
