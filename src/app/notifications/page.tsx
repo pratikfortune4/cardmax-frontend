@@ -1,4 +1,6 @@
 'use client'
+import { IconTrash, IconCheck, IconChevronLeft } from '@/components/Icons';
+
 
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
@@ -136,9 +138,7 @@ export default function NotificationsPage() {
         <div className="cm-notifications-header">
           <div className="cm-notifications-header__left">
             <Link href="/" className="cm-notifications-back">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
+              <IconChevronLeft />
               Back
             </Link>
             <div>
@@ -225,9 +225,7 @@ export default function NotificationsPage() {
                       title="Mark as read"
                       aria-label="Mark as read"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
+                      <IconCheck />
                     </button>
                   )}
                   <button
@@ -237,11 +235,7 @@ export default function NotificationsPage() {
                     title="Delete notification"
                     aria-label="Delete notification"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6l-1 14H6L5 6" />
-                      <path d="M10 11v6M14 11v6" />
-                    </svg>
+                    <IconTrash />
                   </button>
                 </div>
               </div>

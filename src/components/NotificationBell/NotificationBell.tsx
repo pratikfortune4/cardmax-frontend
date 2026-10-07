@@ -1,4 +1,5 @@
 "use client";
+import { IconBell, IconX } from '@/components/Icons';
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
@@ -153,20 +154,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <svg
-          className="cm-notif-bell__icon"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-        </svg>
+        <IconBell className="cm-notif-bell__icon" />
         {unreadCount > 0 && (
           <span className="cm-notif-bell__badge" aria-hidden="true">
             {unreadCount > 99 ? "99+" : unreadCount}
@@ -205,19 +193,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                   onClick={() => setIsOpen(false)}
                   aria-label="Close notifications"
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <IconX />
                 </button>
               </div>
             </div>
@@ -231,19 +207,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
               ) : notifications.length === 0 ? (
                 <div className="cm-notif-dropdown__empty">
                   <div className="cm-notif-empty-icon">
-                    <svg
-                      width="26"
-                      height="26"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                    </svg>
+                    <IconBell />
                   </div>
                   <p>You are all caught up!</p>
                 </div>

@@ -1,4 +1,6 @@
 'use client'
+import { IconLock, IconAlertTriangle, IconX } from '@/components/Icons';
+
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { API_BASE_URL } from '@/lib/api'
@@ -215,28 +217,14 @@ export default function EditCardModal({
             onClick={onClose}
             aria-label="Close modal"
           >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <IconX />
           </button>
         </header>
 
         <form onSubmit={handleSubmit} className="modal-form">
           {formError && (
             <div className="modal-alert error" role="alert">
-              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <IconAlertTriangle />
               <span>{formError}</span>
             </div>
           )}
@@ -266,18 +254,7 @@ export default function EditCardModal({
           {typeof card?.physicalCard === 'object' && card.physicalCard?.panMasked && (
             <div className="linked-vault-banner">
               <div className="vault-banner-left">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
+                <IconLock />
                 <span className="vault-banner-pan">
                   Vault Card: <strong>{card.physicalCard.panMasked}</strong>
                 </span>

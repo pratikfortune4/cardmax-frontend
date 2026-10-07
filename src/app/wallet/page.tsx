@@ -1,4 +1,5 @@
 "use client";
+import { IconReceipt, IconChevronRight, IconChevronLeft, IconCompass, IconTrash, IconEdit, IconLock, IconPlus, IconCreditCard, IconRefreshCw, IconArrowLeft } from '@/components/Icons';
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -331,20 +332,7 @@ export default function WalletPage() {
         {/* Navigation / Header */}
         <div className="wallet-breadcrumb">
           <Link href="/" className="btn-back">
-            <svg
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
+            <IconArrowLeft />
             Back to Dashboard
           </Link>
         </div>
@@ -370,21 +358,7 @@ export default function WalletPage() {
                   style={{ width: 14, height: 14, marginRight: 6 }}
                 />
               ) : (
-                <svg
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  style={{ marginRight: 6 }}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
+                <IconRefreshCw />
               )}
               {isSyncing ? "Syncing..." : "Sync Statements"}
             </button>
@@ -394,20 +368,7 @@ export default function WalletPage() {
               onClick={() => setIsAddModalOpen(true)}
               id="btn-add-card"
             >
-              <svg
-                width="15"
-                height="15"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <IconPlus />
               Add Card
             </button>
           </div>
@@ -472,17 +433,7 @@ export default function WalletPage() {
         ) : cards.length === 0 ? (
           <div className="empty-state-card">
             <div className="empty-icon" aria-hidden="true">
-              <svg
-                width="28"
-                height="28"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                viewBox="0 0 24 24"
-              >
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
+              <IconCreditCard />
             </div>
             <h3>Your wallet is empty</h3>
             <p>
@@ -494,20 +445,7 @@ export default function WalletPage() {
               className="btn-add"
               onClick={() => setIsAddModalOpen(true)}
             >
-              <svg
-                width="15"
-                height="15"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <IconPlus />
               Add Your First Card
             </button>
           </div>
@@ -560,25 +498,7 @@ export default function WalletPage() {
                   {physical && physical.panMasked && (
                     <div className="card-vault-badge">
                       <div className="vault-pan-wrap">
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          aria-hidden="true"
-                        >
-                          <rect
-                            x="3"
-                            y="11"
-                            width="18"
-                            height="11"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
+                        <IconLock />
                         <span className="vault-pan">{physical.panMasked}</span>
                       </div>
                       <div className="vault-meta">
@@ -631,20 +551,7 @@ export default function WalletPage() {
                       onClick={() => setEditingCard(card)}
                       id={`btn-edit-card-${card.id}`}
                     >
-                      <svg
-                        width="13"
-                        height="13"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
+                      <IconEdit />
                       Edit
                     </button>
                     {isActive && (
@@ -654,20 +561,7 @@ export default function WalletPage() {
                         onClick={() => handleOpenDeleteModal(card.id)}
                         id={`btn-remove-card-${card.id}`}
                       >
-                        <svg
-                          width="13"
-                          height="13"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        <IconTrash />
                         Remove
                       </button>
                     )}
@@ -684,19 +578,7 @@ export default function WalletPage() {
             <div className="wallet-rec-header-top">
               <div className="wallet-rec-title-wrap">
                 <h2 className="wallet-rec-title">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-                  </svg>
+                  <IconCompass />
                   <span>Best Card by Category</span>
                 </h2>
                 {!recLoading && (
@@ -724,18 +606,7 @@ export default function WalletPage() {
                           : "pointer",
                     }}
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="15 18 9 12 15 6" />
-                    </svg>
+                    <IconChevronLeft />
                   </button>
                   <span
                     style={{
@@ -762,18 +633,7 @@ export default function WalletPage() {
                           : "pointer",
                     }}
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
+                    <IconChevronRight />
                   </button>
                 </div>
               )}
@@ -840,25 +700,7 @@ export default function WalletPage() {
                       onClick={() => setActiveMathRec(rec)}
                       aria-label={`Show the maths behind ${rec.category} recommendation`}
                     >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="4" y="2" width="16" height="20" rx="2" />
-                        <line x1="8" y1="6" x2="16" y2="6" />
-                        <line x1="8" y1="10" x2="10" y2="10" />
-                        <line x1="14" y1="10" x2="16" y2="10" />
-                        <line x1="8" y1="14" x2="10" y2="14" />
-                        <line x1="14" y1="14" x2="16" y2="14" />
-                        <line x1="8" y1="18" x2="10" y2="18" />
-                        <line x1="14" y1="18" x2="16" y2="18" />
-                      </svg>
+                      <IconReceipt />
                       Show Me the Maths →
                     </button>
                   </div>

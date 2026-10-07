@@ -1,4 +1,5 @@
 "use client";
+import { IconTrendingUp } from '@/components/Icons';
 
 import React from "react";
 import { CreditLimitChart } from "./charts/CreditLimitChart";
@@ -17,19 +18,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({
     <section className="cm-analytics-section" aria-label="Dashboard Analytics">
       <div className="cm-section-title">
         <h2>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 3v18h18" />
-            <path d="m19 9-5 5-4-4-3 3" />
-          </svg>
+          <IconTrendingUp width="20" height="20" />
           Analytics & Insights
         </h2>
       </div>

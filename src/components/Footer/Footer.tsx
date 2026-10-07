@@ -1,4 +1,6 @@
 'use client'
+import { IconShield, IconCreditCard } from '@/components/Icons';
+
 
 import React from 'react'
 import Link from 'next/link'
@@ -33,11 +35,7 @@ export const Footer: React.FC = () => {
         <div className="cm-footer__left">
           <Link href="/" className="cm-footer__brand" aria-label="CardMax Home">
             <div className="cm-footer-brand-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="20" height="14" x="2" y="5" rx="3" />
-                <line x1="2" x2="22" y1="10" y2="10" />
-                <line x1="6" x2="10" y1="15" y2="15" />
-              </svg>
+              <IconCreditCard />
             </div>
             <div>
               <span>Card</span>
@@ -48,9 +46,7 @@ export const Footer: React.FC = () => {
             Smart credit card optimization platform.
           </div>
           <div className="cm-footer__security-inline">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-            </svg>
+            <IconShield />
             <span>Bank-grade security (256-bit encryption)</span>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { IconCalendar, IconInfo } from '@/components/Icons';
 import React from 'react';
 import './AnalysisPeriodSelector.scss';
 
@@ -61,9 +62,7 @@ export const AnalysisPeriodSelector: React.FC<AnalysisPeriodSelectorProps> = ({
                 className="sr-only"
               />
               <div className="aps-option-icon">
-                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <IconCalendar width="24" height="24" />
               </div>
               <div className="aps-option-content">
                 <div className="aps-option-title">
@@ -82,9 +81,7 @@ export const AnalysisPeriodSelector: React.FC<AnalysisPeriodSelectorProps> = ({
 
       <div className="aps-info-box">
         <div className="aps-info-icon">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
+          <IconInfo width="20" height="20" />
         </div>
         <div className="aps-info-text">
           Shorter analysis periods may reduce recommendation accuracy, as we&apos;ll have less data to understand your spending patterns.

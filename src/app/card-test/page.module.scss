@@ -1,0 +1,294 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.pageWrapper {
+  min-height: 100vh;
+  background-color: $color-bg-main;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-6 $spacing-4;
+
+  @media (min-width: $breakpoint-desktop) {
+    padding: $spacing-12 $spacing-8;
+  }
+}
+
+.header {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-8;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: $color-text-secondary;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-2;
+  margin-left: -$spacing-2;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.content {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-3;
+  line-height: $line-height-tight;
+
+  @media (min-width: $breakpoint-desktop) {
+    font-size: $font-size-4xl;
+    text-align: center;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-8;
+  line-height: $line-height-relaxed;
+
+  @media (min-width: $breakpoint-desktop) {
+    text-align: center;
+    margin-bottom: $spacing-10;
+  }
+}
+
+.heroVisual {
+  width: 100%;
+  height: 200px;
+  background: $gradient-hero;
+  border-radius: $radius-xl;
+  margin-bottom: $spacing-8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: $shadow-glow-primary;
+
+  @media (min-width: $breakpoint-desktop) {
+    height: 240px;
+    margin-bottom: $spacing-10;
+  }
+}
+
+.cardMockup {
+  width: 240px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: $radius-lg;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $spacing-4;
+  position: relative;
+  z-index: 2;
+  transform: rotate(-5deg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.cardChip {
+  width: 35px;
+  height: 25px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+}
+
+.cardLines {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.cardLine {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+
+  &.short { width: 40%; }
+  &.long { width: 80%; }
+}
+
+.decorativeCircle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+
+  &.topRight {
+    width: 150px;
+    height: 150px;
+    top: -50px;
+    right: -20px;
+  }
+
+  &.bottomLeft {
+    width: 100px;
+    height: 100px;
+    bottom: -30px;
+    left: -20px;
+  }
+}
+
+.optionsTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-4;
+
+  @media (min-width: $breakpoint-desktop) {
+    text-align: center;
+  }
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-bottom: $spacing-8;
+}
+
+.optionCard {
+  background: $color-surface-white;
+  border: 2px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-4;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    border-color: $color-border-hover;
+    background: $color-surface-subtle;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-subtle;
+  }
+
+  &.selected {
+    border-color: $color-primary;
+    background: $color-primary-subtle;
+    box-shadow: $shadow-md, $shadow-glow-primary;
+  }
+}
+
+.optionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-full;
+  background: $color-bg-main;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-primary;
+  flex-shrink: 0;
+
+  .selected & {
+    background: $color-primary;
+    color: $color-surface-white;
+  }
+}
+
+.optionContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.optionTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 2px;
+}
+
+.optionSubtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.optionArrow {
+  color: $color-text-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .selected & {
+    color: $color-primary;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-4;
+  margin-top: auto;
+}
+
+.continueButton {
+  width: 100%;
+  padding: $spacing-4;
+  background: $color-primary;
+  color: $color-text-on-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: $shadow-md;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-hover;
+    box-shadow: $shadow-lg;
+  }
+
+  &:disabled {
+    background: $color-border-strong;
+    color: $color-text-inverse;
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.securityText {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  margin-top: $spacing-2;
+}
+
+.securityIcon {
+  width: 14px;
+  height: 14px;
+}

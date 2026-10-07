@@ -1,4 +1,5 @@
 "use client";
+import { IconShieldCheck, IconLock, IconSearch, IconAlertTriangle, IconX } from '@/components/Icons';
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { API_BASE_URL } from "@/lib/api";
@@ -427,39 +428,14 @@ export default function AddCardModal({
             onClick={onClose}
             aria-label="Close modal"
           >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <IconX />
           </button>
         </header>
 
         <form onSubmit={handleSubmit} className="modal-form">
           {formError && (
             <div className="modal-alert error" role="alert">
-              <svg
-                width="15"
-                height="15"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+              <IconAlertTriangle />
               <span>{formError}</span>
             </div>
           )}
@@ -494,21 +470,7 @@ export default function AddCardModal({
             ) : (
               <div className="card-picker-wrapper">
                 <div className="search-input-box">
-                  <svg
-                    width="15"
-                    height="15"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    className="search-icon"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+                  <IconSearch className="search-icon" />
                   <input
                     type="text"
                     placeholder="Search by bank or card name (e.g., HDFC, Regalia)..."
@@ -703,18 +665,7 @@ export default function AddCardModal({
                 </label>
               </div>
               <span className="vault-security-pill">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  aria-hidden="true"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
+                <IconLock />
                 AES-256
               </span>
             </div>
@@ -802,21 +753,7 @@ export default function AddCardModal({
                 </div>
 
                 <div className="vault-assurance-note">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                    />
-                  </svg>
+                  <IconShieldCheck />
                   <span>
                     Zero CVV policy. Sensitive card numbers are encrypted before reaching the database. Plaintext PAN is never saved.
                   </span>

@@ -1,4 +1,6 @@
 'use client'
+import { IconCreditCard, IconTrendingUp, IconAlertCircle, IconCheck, IconX, IconReceipt } from '@/components/Icons';
+
 
 /**
  * ShowMeTheMathsModal
@@ -255,16 +257,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
           <div className={styles.headerTop}>
             <div className={styles.headerMeta}>
               <span className={styles.headerLabel}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="4" y="2" width="16" height="20" rx="2" />
-                  <line x1="8" y1="6" x2="16" y2="6" />
-                  <line x1="8" y1="10" x2="10" y2="10" />
-                  <line x1="14" y1="10" x2="16" y2="10" />
-                  <line x1="8" y1="14" x2="10" y2="14" />
-                  <line x1="14" y1="14" x2="16" y2="14" />
-                  <line x1="8" y1="18" x2="10" y2="18" />
-                  <line x1="14" y1="18" x2="16" y2="18" />
-                </svg>
+                <IconReceipt />
                 <span className={styles.headerCategoryText}>Show Me the Maths · {icon} {category}</span>
                 {/* Data source badge */}
                 {!loading && (
@@ -281,22 +274,14 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
               aria-label="Close modal"
               id="show-maths-close-btn"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
+              <IconX />
             </button>
           </div>
 
           {/* Verdict badge */}
           {breakdown && (
             <div className={`${styles.verdictBadge} ${breakdown.annualValueGap < 0 ? styles['verdictBadge--negative'] : ''}`}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                {breakdown.annualValueGap >= 0 ? (
-                  <polyline points="20 6 9 17 4 12" />
-                ) : (
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                )}
-              </svg>
+              {breakdown.annualValueGap >= 0 ? <IconCheck /> : <IconX />}
               {breakdown.annualValueGap >= 0 ? (
                 <>
                   You save{' '}
@@ -350,11 +335,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
 
               {breakdown.earningMechanism && (
                 <div className={styles.mechanismPill} style={{ marginBottom: '0.75rem' }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" x2="12" y1="8" y2="12" />
-                    <line x1="12" x2="12.01" y1="16" y2="16" />
-                  </svg>
+                  <IconAlertCircle />
                   {breakdown.earningMechanism}
                 </div>
               )}
@@ -449,10 +430,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
                 </div>
 
                 <div className={styles.gapBadge}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                    <polyline points="17 6 23 6 23 12" />
-                  </svg>
+                  <IconTrendingUp />
                   {breakdown.annualValueGap >= 0
                     ? `You earn ${fmt(Math.abs(animGap))} more per year with ${recommendedName}`
                     : `${recommendedName} earns ${fmt(Math.abs(animGap))} less — consider the fees`}
@@ -471,10 +449,7 @@ export default function ShowMeTheMathsModal({ recommendation, onClose }: Props) 
             className={styles.ctaBtn}
             id={`show-maths-cta-${category.replace(/\s+/g, '-').replace(/&/g, 'and').toLowerCase()}`}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="20" height="14" x="2" y="5" rx="3" />
-              <line x1="2" x2="22" y1="10" y2="10" />
-            </svg>
+            <IconCreditCard />
             Apply / Add to My Wallet
           </Link>
           <p className={styles.ctaNote}>

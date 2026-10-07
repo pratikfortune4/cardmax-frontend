@@ -1,3 +1,4 @@
+import { IconCreditCard, IconLogOut } from '@/components/Icons';
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -39,18 +40,7 @@ export default async function LogoutPage() {
       <div className="cm-logout-brand-header">
         <Link href="/" className="cm-logout-logo" aria-label="CardMax Home">
           <div className="cm-logout-logo-icon">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="20" height="14" x="2" y="5" rx="3" />
-              <line x1="2" x2="22" y1="10" y2="10" />
-              <line x1="6" x2="10" y1="15" y2="15" />
-            </svg>
+            <IconCreditCard />
           </div>
           <div className="cm-logout-brand-text">
             <span>Card</span>
@@ -62,18 +52,7 @@ export default async function LogoutPage() {
       {/* Confirmation Card */}
       <div className="cm-logout-card">
         <div className="cm-logout-icon-wrap" aria-hidden="true">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          <IconLogOut />
         </div>
 
         <h1 className="cm-logout-title">Log out of CardMax</h1>

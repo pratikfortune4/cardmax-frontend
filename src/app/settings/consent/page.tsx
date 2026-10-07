@@ -1,4 +1,6 @@
 'use client'
+import { IconX, IconAlertTriangle, IconCheck, IconArrowLeft } from '@/components/Icons';
+
 
 import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
@@ -171,16 +173,7 @@ export default function ConsentPage() {
         {/* Breadcrumb */}
         <div className="consent-breadcrumb">
           <Link href="/" className="btn-back">
-            <svg
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <IconArrowLeft />
             Back to Dashboard
           </Link>
         </div>
@@ -199,31 +192,9 @@ export default function ConsentPage() {
             <div className="alert-content">
               <span className="alert-icon">
                 {message.type === 'success' ? (
-                  <svg
-                    width="15"
-                    height="15"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <IconCheck />
                 ) : (
-                  <svg
-                    width="15"
-                    height="15"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
+                  <IconAlertTriangle />
                 )}
               </span>
               <span>{message.text}</span>
@@ -234,16 +205,7 @@ export default function ConsentPage() {
               onClick={() => setMessage(null)}
               aria-label="Dismiss"
             >
-              <svg
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <IconX />
             </button>
           </div>
         )}
