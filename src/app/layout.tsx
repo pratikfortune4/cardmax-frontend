@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { hasRequiredConsent } from '@/lib/guard'
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api'
 import { PolicyBanner } from '@/components/PolicyBanner'
-import { Navbar, type NavbarUser } from '@/components/Navbar'
+import { Navbar } from '@/components/Navbar'
+import { UserProvider } from '@/context/UserContext'
 import { Footer } from '@/components/Footer'
 import './styles.scss'
 
@@ -29,7 +30,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const cookieStore = await cookies()
   const token = cookieStore.get('payload-token')?.value
 
-  let currentUser: NavbarUser | null = null
+  let currentUser = null
 
   if (token) {
     try {
@@ -43,12 +44,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         const user = data?.user
 
         if (user) {
-          currentUser = {
-            id: String(user.id),
-            email: user.email,
-            name: user.name || user.firstName || null,
-            isPro: user.isPro ?? false,
-          }
+          currentUser = user
 
           const hasConsent = hasRequiredConsent(user)
 
@@ -74,10 +70,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className="cm-app-body">
-        <PolicyBanner />
-        <Navbar initialUser={currentUser} />
-        <main className="cm-app-main">{children}</main>
-        <Footer />
+        <UserProvider initialUser={currentUser as any}>
+          <PolicyBanner />
+          <Navbar />
+          <main className="cm-app-main">{children}</main>
+          <Footer />
+        </UserProvider>
       </body>
     </html>
   )

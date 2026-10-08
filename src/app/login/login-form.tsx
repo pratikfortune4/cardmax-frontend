@@ -140,7 +140,10 @@ export const LoginForm = () => {
     if (data.consentRequired) {
       window.location.assign('/consent-onboarding')
     } else {
-      window.location.assign(data.profileComplete ? '/' : '/complete-profile')
+      const searchParams = new URLSearchParams(window.location.search)
+      const redirectUrl = searchParams.get('redirect')
+      const target = redirectUrl && redirectUrl.startsWith('/') ? redirectUrl : (data.profileComplete ? '/' : '/complete-profile')
+      window.location.assign(target)
     }
   }
 

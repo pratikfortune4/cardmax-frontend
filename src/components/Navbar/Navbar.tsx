@@ -39,49 +39,17 @@ const HIDDEN_ROUTES = [
   "/complete-profile",
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
+import { useUser } from "@/context/UserContext";
+
+export const Navbar: React.FC = () => {
   const pathname = usePathname();
-  const [user, setUser] = useState<NavbarUser | null>(initialUser ?? null);
+  const { user, isAuthenticated, logout } = useUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Keep state synchronized with prop updates
-  useEffect(() => {
-    if (initialUser !== undefined) {
-      setUser(initialUser);
-    }
-  }, [initialUser]);
 
-  // Synchronize auth state on route changes (ensures clean guest/auth transitions)
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.user) {
-            setUser({
-              id: String(data.user.id),
-              email: data.user.email,
-              name: data.user.name || data.user.firstName || null,
-              isPro: data.user.isPro ?? false,
-            });
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
-      } catch {
-        // Non-blocking
-      }
-    };
-    checkAuth();
-  }, [pathname]);
 
   // Close menus when route changes
   useEffect(() => {
@@ -128,17 +96,8 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
 
   const handleLogout = async () => {
     setLoggingOut(true);
-    try {
-      await fetch(`${API_BASE_URL}/api/users/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch {
-      // Continue to redirect regardless
-    } finally {
-      setUser(null);
-      window.location.href = "/";
-    }
+    await logout();
+    window.location.href = "/";
   };
 
   const navLinks: Array<{
@@ -192,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialUser }) => {
 
         {/* Actions (Right) */}
         <div className="cm-navbar__actions">
-          {user && <NotificationBell userId={user.id} />}
+          {user && <NotificationBell userId={String(user.id)} />}
           {user ? (
             <div className="cm-profile-dropdown" ref={dropdownRef}>
               <button

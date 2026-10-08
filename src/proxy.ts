@@ -1,9 +1,37 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const PROTECTED_ROUTES = [
+  '/card-test',
+  '/profile',
+  '/wallet',
+  '/gmail',
+  '/statements',
+  '/subscription',
+  '/max-pro',
+  '/settings',
+  '/complete-profile',
+  '/consent-onboarding',
+  '/cards',
+  '/manual',
+  '/results',
+  '/notifications'
+]
+
 export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-pathname', request.nextUrl.pathname)
+  const pathname = request.nextUrl.pathname
+  requestHeaders.set('x-pathname', pathname)
+
+  const isProtected = PROTECTED_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'))
+  const token = request.cookies.get('payload-token')?.value
+
+  if (isProtected && !token) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(url)
+  }
 
   return NextResponse.next({
     request: {

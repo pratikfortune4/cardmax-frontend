@@ -6,24 +6,19 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { API_BASE_URL } from '@/lib/api'
 
+import { useUser } from '@/context/UserContext'
+
 export const LogoutButton = () => {
   const [loggingOut, setLoggingOut] = useState(false)
   const [error, setError] = useState('')
+  const { logout } = useUser()
 
   const handleLogout = async () => {
     setLoggingOut(true)
     setError('')
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-      if (!res.ok) {
-        setError('Could not log out. Please try again.')
-        setLoggingOut(false)
-        return
-      }
+      await logout()
       window.location.href = '/'
     } catch {
       setError('Network error. Please try again.')
