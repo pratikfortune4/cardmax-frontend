@@ -1,15 +1,16 @@
 import { API_BASE_URL } from "@/lib/api";
 
 export interface StatementSyncProfile {
-  monthlySpend: string;
-  fdSpend: string;
-  employmentType: string;
+  monthlySpend?: string;
+  fdSpend?: string;
+  annualIncome?: string;
+  employmentType?: string;
   portfolioSize: string;
-  loungeAccess: string;
-  fullName: string;
-  dob: string;
-  mobileNumber: string;
-  primaryRewardGoals: string[];
+  loungeAccess?: string;
+  fullName?: string;
+  dob?: string;
+  mobileNumber?: string;
+  primaryRewardGoals?: string[];
   banksUsed: string[];
 }
 
@@ -98,7 +99,7 @@ export const optimizeUploadedStatements = async (files: File[], profile: Stateme
 
 export interface ManualSpendPayload {
   profile: StatementSyncProfile;
-  fuelPreference: string;
+  fuelPreference?: string;
   vectorValues: Record<string, number>;
   selectedCards: string[];
 }

@@ -32,14 +32,14 @@ export const SpendAnalysisChart: React.FC<SpendAnalysisChartProps> = ({
     );
   }
 
-  const formatYAxis = (value: number) => {
+  const formatYAxis = (value: any) => {
     return new Intl.NumberFormat("en-IN", {
       notation: "compact",
       compactDisplay: "short",
     }).format(value);
   };
 
-  const formatTooltip = (value: number) => {
+  const formatTooltip = (value: any) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",

@@ -18,7 +18,7 @@ export const CreditLimitChart: React.FC<CreditLimitChartProps> = ({ data }) => {
     )
   }
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: any) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',

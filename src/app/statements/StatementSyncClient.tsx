@@ -120,7 +120,7 @@ export function StatementSyncClient() {
 
   const handleGoalToggle = (goal: string) => {
     setProfile((prev) => {
-      let newGoals = [...prev.primaryRewardGoals];
+      let newGoals = [...(prev.primaryRewardGoals || [])];
       if (goal === "Auto (recommended)") {
         newGoals = ["Auto (recommended)"];
       } else {
@@ -377,7 +377,7 @@ export function StatementSyncClient() {
               {REWARD_GOALS.map((g) => (
                 <button
                   key={g}
-                  className={`${styles.pillButton} ${profile.primaryRewardGoals.includes(g) ? styles.active : ""}`}
+                  className={`${styles.pillButton} ${(profile.primaryRewardGoals || []).includes(g) ? styles.active : ""}`}
                   onClick={() => handleGoalToggle(g)}
                 >
                   {g}

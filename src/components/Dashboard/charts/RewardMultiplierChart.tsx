@@ -16,7 +16,7 @@ export const RewardMultiplierChart: React.FC<RewardMultiplierChartProps> = ({ da
     )
   }
 
-  const customTooltipFormatter = (val: number, name: string, props: any) => {
+  const customTooltipFormatter = (val: any, name: any, props: any) => {
     const isCashback = props.payload.type === 'cashback'
     return [
       `${val}${isCashback ? '%' : 'x'}`,
